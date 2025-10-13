@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 export default function Documents() {
   const [docs, setDocs] = useState([]);
   const [purchased, setPurchased] = useState([]);
 
+  const {user}=useAuth();
   useEffect(() => {
     loadDocs();
     loadPurchased(); 
@@ -43,7 +45,7 @@ console.log("data",data);
         alert('Payment success!');
         setPurchased([...purchased, doc._id]);
       },
-      prefill: { email: JSON.parse(localStorage.getItem('user')).email }
+      prefill: { email: user?.email || '' },
     };
 
     const razorpay = new window.Razorpay(options);
