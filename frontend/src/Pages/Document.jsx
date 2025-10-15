@@ -55,17 +55,30 @@ console.log("data",data);
 async function view(doc) {
   try {
     const res = await api.get(`/api/v1/doc/${doc._id}/view`, {
-      responseType: "blob", 
+      responseType: "blob",
     });
 
-    // Convert the blob to a URL and open in a new tab
-    const fileURL = URL.createObjectURL(res.data);
-    window.open(fileURL, "_blank");
+    const blob = new Blob([res.data], { type: res.headers["content-type"] });
+    const fileURL = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = fileURL;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+
+   
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+   
+    setTimeout(() => URL.revokeObjectURL(fileURL), 1000);
   } catch (err) {
     console.error("Error viewing document:", err);
     alert("Failed to open document");
   }
 }
+
 
  async function download(doc) {
     try {
@@ -93,80 +106,74 @@ async function view(doc) {
 
 
   return (
-     <div className="font-poppins">
-      
-      <div className="text-center mb-12">
-        <h2 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#4f46e5] to-[#22c55e]">
-          Explore Premium Documents
-        </h2>
-        <p className="text-[#64748b] mt-2 text-sm">
-          Browse, preview, and buy high-quality notes, reports, and guides.
-        </p>
-      </div>
+      <div className="font-poppins px-3 sm:px-8 py-6">
+    <div className="text-center mb-8 sm:mb-12">
+      <h2 className="text-2xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#4f46e5] to-[#22c55e]">
+        Explore Premium Documents
+      </h2>
+      <p className="text-[#64748b] mt-2 text-xs sm:text-sm">
+        Browse, preview, and buy high-quality notes, reports, and guides.
+      </p>
+    </div>
 
-    {/* apna data display wala function */}
-      <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4 justify-center">
-        {docs.map((doc) => (
-          <div
-            key={doc._id}
-            className="group flex flex-col bg-white rounded-2xl shadow-sm border border-[#e2e8f0] hover:shadow-lg hover:-translate-y-1 transition-all duration-300 overflow-hidden"
-          >
-          
-            <div className="relative h-48 bg-[#f1f5f9]">
-              <img
-                src={
-                  doc.image ||
-                  pdfimage
-                }
-                alt={doc.title}
-                className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
-              />
-              <span className="absolute top-3 right-3 bg-blue-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md">
-                ₹{doc.price}
-              </span>
-            </div>
+    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6 lg:gap-8 justify-center">
+      {docs.map((doc) => (
+        <div
+          key={doc._id}
+          className="group flex flex-col bg-white rounded-xl sm:rounded-2xl shadow-md border border-[#e2e8f0] hover:shadow-lg hover:-translate-y-1 transition-all duration-300 overflow-hidden"
+        >
+          {/* Image */}
+          <div className="relative h-36 sm:h-48 bg-[#f1f5f9]">
+            <img
+              src={doc.image || pdfimage}
+              alt={doc.title}
+              className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
+            />
+            <span className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-blue-600 text-white text-[10px] sm:text-xs font-semibold px-2 py-1 rounded-full shadow-md">
+              ₹{doc.price}
+            </span>
+          </div>
 
-           
-            <div className="flex flex-col flex-grow p-5">
-              <h3 className="text-lg font-semibold text-[#0f172a] mb-2 line-clamp-1">
-                {doc.title}
-              </h3>
-              <p className="text-sm text-[#475569] mb-5 line-clamp-3">
-                {doc.description ||
-                  "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."}
-              </p>
+          {/* Card content */}
+          <div className="flex flex-col flex-grow p-3 sm:p-5">
+            <h3 className="text-sm sm:text-lg font-semibold text-[#0f172a] mb-1 sm:mb-2 line-clamp-1">
+              {doc.title}
+            </h3>
+            <p className="text-xs sm:text-sm text-[#475569] mb-4 sm:mb-5 line-clamp-3">
+              {doc.description ||
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."}
+            </p>
 
-             
-              <div className="mt-auto">
-                {purchased.includes(doc._id) ? (
-                  <div className="flex space-x-3">
-                    <button
-                      onClick={() => view(doc)}
-                      
-                      className="flex-1 text-white bg-gradient-to-r from-cyan-500 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-cyan-300 dark:focus:ring-cyan-800 font-medium rounded-lg  px-5 py-2 text-center "
-                    >
-                      View
-                    </button>
-                    <button
-                      onClick={() => download(doc)}
-                      className="flex-1 text-white bg-gradient-to-br from-green-400 to-blue-600 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg  px-5 py-2 text-center"
-                    >
-                      Download
-                    </button>
-                  </div>
-                ) : (
+            {/* Buttons */}
+            <div className="mt-auto">
+              {purchased.includes(doc._id) ? (
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                   <button
-                    onClick={() => buy(doc)}
-                    className="w-full bg-gradient-to-r from-blue-600 to-[#22c55e] hover:from-[#4f46e5] hover:to-[#16a34a] text-white px-4 py-2 rounded-lg transition font-semibold cursor-pointer"
+                    onClick={() => view(doc)}
+                    className="w-full text-xs sm:text-sm text-white bg-gradient-to-r from-cyan-500 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-cyan-300 font-medium rounded-md sm:rounded-lg px-3 py-1.5 sm:px-5 sm:py-2 text-center cursor-pointer"
                   >
-                    Buy Now
+                    View
                   </button>
-                )}
-              </div>
+                  <button
+                    onClick={() => download(doc)}
+                    className="w-full text-xs sm:text-sm text-white bg-gradient-to-br from-green-400 to-blue-600 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 font-medium rounded-md sm:rounded-lg px-3 py-1.5 sm:px-5 sm:py-2 text-center cursor-pointer"
+                  >
+                    Download
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => buy(doc)}
+                  className="w-full text-xs sm:text-sm bg-gradient-to-r from-blue-600 to-[#22c55e] hover:from-[#4f46e5] hover:to-[#16a34a] text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-md sm:rounded-lg transition font-semibold cursor-pointer"
+                >
+                  Buy Now
+                </button>
+              )}
             </div>
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
     </div>
+  </div>
   );
 }
