@@ -32,7 +32,7 @@ function App() {
    
       <Layout>
      <Routes>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/" element={<Navigate to="/document" replace />} />
         <Route path="/login" element={<Login />} />
         <Route path="/admin" element={<Admin/> } />
         <Route
