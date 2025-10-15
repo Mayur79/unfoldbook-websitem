@@ -4,6 +4,7 @@ import { Navigate, Route, Router, Routes } from 'react-router-dom'
 import PrivateRoute from './services/PrivateRoute'
 import Dashboard from './Pages/Dashboard'
 import Login from './Pages/Login'
+import Admin from './Component/Admin'
 import Documents from './Pages/Document'
 import Layout from './Layout/Layout'
 import PageNotFound from './Pages/PageNotFound'
@@ -13,18 +14,18 @@ import "@fontsource/poppins/600.css";
 
 function App() {
 
- const status = useHealthCheck();
+//  const status = useHealthCheck();
 
 
-  if (status === 'error') {
-    return (
-      <>
-      <Layout>
-         <PageNotFound />
-      </Layout>
-      </>
-    );
-  }
+  // if (status === 'error') {
+  //   return (
+  //     <>
+  //     <Layout>
+  //        <PageNotFound />
+  //     </Layout>
+  //     </>
+  //   );
+  // }
 
   return (
     <>
@@ -33,6 +34,7 @@ function App() {
      <Routes>
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/admin" element={<Admin/> } />
         <Route
           path="/dashboard"
           element={

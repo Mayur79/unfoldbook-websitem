@@ -5,6 +5,9 @@ const cors = require("cors");
 const app = express();
 const authRoute = require("./route/authRoute.js");
 const morgan = require("morgan");
+const userRoute = require("./route/userRoute");
+
+
 // const productRoute = require("../routes/productRoute.js");
 const bodyParser = require("body-parser");
 const paymentRote = require("./route/paymentRoute.js");
@@ -30,6 +33,8 @@ app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/doc", documentRoute);
 app.use("/api/v1/pay", paymentRote);
+
+app.use("/api/users", userRoute);
 
 app.get("/api/health", (req, res) => {
   res.status(isDBConnected ? 200 : 500).json({
