@@ -74,4 +74,33 @@ router.get("/:id/view", middleware, async (req, res) => {
   }
 });
 
+// server route
+router.get("/:id/presign", middleware, async (req, res) => {
+  try {
+    const doc = await documentModel.findById(req.params.id);
+    if (!doc) return res.status(404).json({ message: "Document not found" });
+
+    const purchased = await paymentModel.findOne({
+      userId: req.user.id,
+      documentId: doc._id,
+    });
+    if (!purchased)
+      return res.status(403).json({ message: "You haven't purchased this document" });
+
+    const params = {
+      Bucket: process.env.S3_BUCKET,
+      Key: doc.fileKey,
+      Expires: 60 * 5, // 5 minutes
+      ResponseContentDisposition: `inline; filename="${encodeURIComponent(doc.title)}"`,
+    };
+
+    const url = s3.getSignedUrl("getObject", params);
+    res.json({ url });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error generating presigned URL" });
+  }
+});
+
+
 module.exports = router;

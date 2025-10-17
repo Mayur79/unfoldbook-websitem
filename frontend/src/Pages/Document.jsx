@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import pdfimage from "../assets/pdfimage.png";
+import { useNavigate } from 'react-router-dom';
 export default function Documents() {
   const [docs, setDocs] = useState([]);
   const [purchased, setPurchased] = useState([]);
 
+  const navigate = useNavigate();
   const {user}=useAuth();
   useEffect(() => {
     loadDocs();
@@ -53,31 +55,10 @@ console.log("data",data);
   }
 
 async function view(doc) {
-  try {
-    const res = await api.get(`/api/v1/doc/${doc._id}/view`, {
-      responseType: "blob",
-    });
-
-    const blob = new Blob([res.data], { type: res.headers["content-type"] });
-    const fileURL = URL.createObjectURL(blob);
-
-    const link = document.createElement("a");
-    link.href = fileURL;
-    link.target = "_blank";
-    link.rel = "noopener noreferrer";
-
-   
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-   
-    setTimeout(() => URL.revokeObjectURL(fileURL), 1000);
-  } catch (err) {
-    console.error("Error viewing document:", err);
-    alert("Failed to open document");
-  }
+  navigate(`/viewer/${doc._id}`);
 }
+
+
 
 
  async function download(doc) {
@@ -93,7 +74,7 @@ async function view(doc) {
       const fileURL = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = fileURL;
-      link.download = doc.title || "document"; // filename suggestion
+      link.download = doc.title || "document";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

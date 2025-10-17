@@ -48,12 +48,12 @@ const connectAndTrackDB = async () => {
     await connectDB();
     isDBConnected = true;
   } catch (err) {
+    console.error("Failed to connect MongoDB:", err.message);
     isDBConnected = false;
   }
 };
 
 connectAndTrackDB();
-
 const port = process.env.PORT || 4000;
 // seed();
 // seedDoc();
