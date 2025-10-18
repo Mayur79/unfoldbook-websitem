@@ -47,34 +47,11 @@ async function loadDocument() {
   return (
     <div className="flex flex-col h-screen w-full">
       
-      <div className="flex items-center justify-between bg-white shadow px-4">
-        <button
-          onClick={() => navigate(-1)}
-          className="text-blue-600 font-medium hover:underline"
-        >
-          ← Back
-        </button>
+      <div className="flex items-center  bg-white shadow px-4 gap-2">
+       Viewing on <span className="font-semibold text-blue-600">UNCOV</span>
       </div>
 
-   {/* zoom aur page no code */}
-<div className="flex flex-col sm:flex-row items-center justify-between border-b px-4 py-2 z-50">
-  <div className="flex items-center gap-2 bg-white border border-gray-300 rounded-md px-2 py-1 shadow-sm mb-2 sm:mb-0">
-    <GoToPreviousPage />
-    <div className="flex items-center gap-1 text-gray-800">
-      <CurrentPageInput />
-      <span className="text-sm text-gray-600">/ <NumberOfPages /></span>
-    </div>
-    <GoToNextPage />
-  </div>
 
-
-  <div className="flex items-center gap-2 bg-white border border-gray-300 rounded-md px-2 py-1 shadow-sm sm:absolute sm:left-1/2 sm:transform sm:-translate-x-1/2">
-    <ZoomOutButton />
-    <ZoomPopover />
-    <ZoomInButton />
-  </div>
-
-</div>
 
 
      {/* viewer ka code */}
@@ -94,10 +71,51 @@ defaultScale={SpecialZoomLevel.PageFit}
             Loading PDF...
           </div>
         )}
-        <div className="absolute bottom-3 left-4 text-gray-600 text-sm opacity-80 select-none">
-  Viewing on <span className="font-semibold text-blue-600">UNCOV</span>
-</div>
+      
       </div>
+     {/* page no and zoom ka code */}
+<div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 ">
+  <div className="flex items-center md:gap-2 bg-white border border-gray-200 rounded-full shadow-lg px-2 md:px-4 py-2 backdrop-blur-sm bg-opacity-95">
+  
+    <div className="flex items-center gap-2">
+      <button className="md:p-1.5 hover:bg-gray-100 rounded-full transition-colors duration-200 text-gray-600 hover:text-gray-900">
+        <GoToPreviousPage />
+      </button>
+
+      <div className="flex items-center md:gap-1 md:px-2 py-0.5 text-sm font-medium text-gray-700">
+        <CurrentPageInput />
+        <span className="text-gray-400">/</span>
+        <span>
+          <NumberOfPages />
+        </span>
+      </div>
+
+      <button className="md:p-1.5 hover:bg-gray-100 rounded-full transition-colors duration-200 text-gray-600 hover:text-gray-900">
+        <GoToNextPage />
+      </button>
+    </div>
+
+   
+    <div className="h-6 border-l border-gray-300 mx-3"></div>
+
+ 
+    <div className="flex items-center gap-2">
+      <button className="md:p-1.5 hover:bg-gray-100 rounded-full transition-colors duration-200 text-gray-600 hover:text-gray-900">
+        <ZoomOutButton />
+      </button>
+
+      <div className="md:px-1">
+        <ZoomPopover />
+      </div>
+
+      <button className="md:p-1.5 hover:bg-gray-100 rounded-full transition-colors duration-200 text-gray-600 hover:text-gray-900">
+        <ZoomInButton />
+      </button>
+    </div>
+  </div>
+</div>
+
+
     </div>
   );
 }
