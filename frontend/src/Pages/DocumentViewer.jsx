@@ -47,7 +47,7 @@ async function loadDocument() {
   return (
     <div className="flex flex-col h-screen w-full">
       
-      <div className="flex items-center  bg-white shadow px-4">
+      <div className="flex items-center  bg-white shadow px-4 gap-2">
        Viewing on <span className="font-semibold text-blue-600">UNCOV</span>
       </div>
 
