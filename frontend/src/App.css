@@ -5,3 +5,36 @@
 .font-poppins {
   font-family: 'Poppins', sans-serif;
 }
+
+
+/* Put this in a file imported after plugin styles, e.g. src/styles/pdf-overrides.css */
+
+/* If Popper sets data-popper-placement="bottom" (common), flip it */
+.rpv-core__popover, .rpv-core__popover-body,
+.rpv-toolbar__popover, [data-popper-placement^="bottom"], [data-placement^="bottom"] {
+  /* Make sure the popover will be positioned from the bottom instead of top */
+  top: auto !important;
+  bottom: calc(100% + 8px) !important; /* place it above anchor, adjust gap */
+  transform-origin: bottom center !important;
+}
+
+/* Adjust arrow if present */
+[rpv-core__popover] .rpv-core__popover-arrow,
+.rpv-core__popover .rpv-core__popover-arrow,
+.rpv-toolbar__popover .rpv-core__popover-arrow {
+  top: auto !important;
+  bottom: -6px !important;     /* tuck the arrow under the popover */
+  transform: rotate(180deg) !important;
+}
+
+/* Ensure overflow/stacking doesn't clip it */
+.rpv-core__popover, .rpv-core__popover-body {
+  z-index: 99999 !important;
+}
+
+/* If popover gets clipped by a parent with overflow:hidden, try making it fixed */
+[rpv-core__popover], .rpv-core__popover {
+  position: fixed !important;
+}
+
+
