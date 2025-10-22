@@ -69,10 +69,10 @@ export default function RolePage() {
           <thead>
             <tr className="text-left text-sm text-gray-500 uppercase tracking-wide">
               <th className="py-2 px-4">Customer</th>
-              <th className="py-2 px-4">Payment Method</th>
-              <th className="py-2 px-4">Categories</th>
+            
+              
               <th className="py-2 px-4">Role</th>
-              <th className="py-2 px-4">Engagement</th>
+            
             </tr>
           </thead>
 
@@ -93,29 +93,10 @@ export default function RolePage() {
                   </div>
                 </td>
 
-                {/* Payment */}
-                <td className="py-4 px-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs px-2 py-1 border border-gray-200 bg-gray-50 rounded-md">
-                      {p.method}
-                    </span>
-                    <Info size={14} className="text-gray-400" />
-                  </div>
-                </td>
+               
 
-                {/* Categories */}
-                <td className="py-4 px-4">
-                  <div className="flex flex-wrap gap-2">
-                    {p.categories.map((c, i) => (
-                      <span
-                        key={i}
-                        className="text-xs px-2 py-1 rounded-full bg-emerald-50 text-emerald-700 font-medium"
-                      >
-                        {c}
-                      </span>
-                    ))}
-                  </div>
-                </td>
+                
+                
 
                 {/* Role Dropdown */}
                 <td className="py-4 px-4">
@@ -138,25 +119,7 @@ export default function RolePage() {
                   </div>
                 </td>
 
-                {/* Engagement */}
-                <td className="py-4 px-4 rounded-r-xl">
-                  <div className="w-full max-w-xs">
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="text-gray-600">CTR</span>
-                      <span className="text-gray-400">
-                        {Math.round(p.pct * 100)}%
-                      </span>
-                    </div>
-                    <div className="relative h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                      <div
-                        style={{
-                          width: `${Math.round(p.pct * 100)}%`,
-                        }}
-                        className="absolute left-0 top-0 h-full bg-gradient-to-r from-emerald-500 via-indigo-500 to-purple-500 rounded-full transition-all"
-                      ></div>
-                    </div>
-                  </div>
-                </td>
+                
               </tr>
             ))}
           </tbody>

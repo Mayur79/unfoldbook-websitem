@@ -3,37 +3,41 @@ import React, { useState } from "react";
 import Sidebar from "./Sidebar";
 import Dashboard from "./Dashboard";
 import RolePage from "./RolePage";
+import Customer from "./Customer";
+import AllDocuments from "./AllDocuments";
 
 export default function Admin() {
   const [active, setActive] = useState("dashboard");
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto p-1">
-        <div className="flex gap-6">
-          <Sidebar active={active} onNavigate={setActive} />
-          <main className="flex-1">
-            <header className="mb-6">
-              <div className="flex items-center justify-between">
-                <h1 className="text-2xl font-semibold text-gray-900">
-                  {active === "dashboard" ? "Orders" : "Roles"}
-                </h1>
-                <div className="flex items-center gap-3">
-                  <div className="hidden md:flex items-center space-x-3">
-                    <button className="px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm">June</button>
-                    <button className="px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm">Export</button>
-                  </div>
-                  <button className="px-3 py-2 text-sm rounded-lg bg-green-100 text-green-700">+ Connect wallet</button>
-                </div>
-              </div>
-            </header>
+  const renderPage = () => {
+    switch (active) {
+      case "dashboard":
+        return <Dashboard />;
+      case "roles":
+        return <RolePage />;
+      case "customers":
+        return <Customer />;
+      case "alldocuments":
+        return <AllDocuments />;
+      default:
+        return <Dashboard />;
+    }
+  };
 
-            <section>
-              {active === "dashboard" ? <Dashboard /> : <RolePage />}
-            </section>
-          </main>
-        </div>
-      </div>
+  return (
+    <div className="min-h-screen flex bg-gray-50">
+      {/* Sidebar */}
+      <Sidebar active={active} onNavigate={setActive} />
+
+      {/* Main Content Area */}
+      <main className="flex-1 p-6 overflow-auto transition-all">
+        
+
+        {/* Page Content */}
+        <section >
+          {renderPage()}
+        </section>
+      </main>
     </div>
   );
 }
