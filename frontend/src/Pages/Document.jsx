@@ -106,7 +106,8 @@ async function view(doc) {
           {/* Image */}
           <div className="relative h-36 sm:h-48 bg-[#f1f5f9]">
             <img
-              src={doc.image || pdfimage}
+           src={doc.thumbnailBase64 || pdfimage}
+
               alt={doc.title}
               className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
             />
@@ -133,13 +134,13 @@ async function view(doc) {
                     onClick={() => view(doc)}
                     className="w-full text-xs sm:text-sm text-white bg-gradient-to-r from-cyan-500 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-cyan-300 font-medium rounded-md sm:rounded-lg px-3 py-1.5 sm:px-5 sm:py-2 text-center cursor-pointer"
                   >
-                    View
+                    Download
                   </button>
                   <button
                     onClick={() => download(doc)}
                     className="w-full text-xs sm:text-sm text-white bg-gradient-to-br from-green-400 to-blue-600 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 font-medium rounded-md sm:rounded-lg px-3 py-1.5 sm:px-5 sm:py-2 text-center cursor-pointer"
                   >
-                    Download
+Share
                   </button>
                 </div>
               ) : (

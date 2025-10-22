@@ -8,6 +8,7 @@ import Documents from './Pages/Document';
 import Layout from './Layout/Layout';
 import PageNotFound from './Pages/PageNotFound';
 import DocumentViewer from './Pages/DocumentViewer';
+import UploadDocument from './Pages/UploadDocument';
 
 function App() {
   return (
@@ -46,6 +47,14 @@ function App() {
                 element={
                   <PrivateRoute>
                     <Documents />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/upload-document"
+                element={
+                  <PrivateRoute>
+                    <UploadDocument />
                   </PrivateRoute>
                 }
               />

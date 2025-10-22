@@ -58,7 +58,7 @@ const port = process.env.PORT || 4000;
 // seed();
 // seedDoc();
 app.get("/", (req, res) => {
-  res.send("Welcome to my Furno backend");
+  res.send("Welcome to my Unfold backend");
 });
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
