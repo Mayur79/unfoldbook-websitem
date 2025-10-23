@@ -58,6 +58,27 @@ async function view(doc) {
   navigate(`/viewer/${doc._id}`);
 }
 
+async function share(doc) {
+  try {
+    const res = await api.get(`/api/v1/doc/${doc._id}/share`);
+    const shareUrl = res.data.shareUrl;
+
+    if (navigator.share) {
+      await navigator.share({
+        title: doc.title,
+        text: `Check out this document: ${doc.title}`,
+        url: shareUrl,
+      });
+    } else {
+      await navigator.clipboard.writeText(shareUrl);
+      alert("Share link copied to clipboard!");
+    }
+  } catch (err) {
+    console.error("Error generating share link:", err);
+    alert("Failed to generate share link.");
+  }
+}
+
 
 
 
@@ -137,7 +158,7 @@ async function view(doc) {
                     Download
                   </button>
                   <button
-                    onClick={() => download(doc)}
+                    onClick={() => share(doc)}
                     className="w-full text-xs sm:text-sm text-white bg-gradient-to-br from-green-400 to-blue-600 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 font-medium rounded-md sm:rounded-lg px-3 py-1.5 sm:px-5 sm:py-2 text-center cursor-pointer"
                   >
 Share

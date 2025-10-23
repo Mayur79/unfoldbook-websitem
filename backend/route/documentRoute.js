@@ -7,6 +7,7 @@ const paymentModel = require("../model/paymentModel");
 const multer = require("multer");
 const categoryModel = require("../model/categoryModel");
 const upload = multer({ storage: multer.memoryStorage() });
+const jwt=require("jsonwebtoken");
 const s3 = new AWS.S3({
   region: process.env.AWS_REGION,
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -207,6 +208,10 @@ router.get("/:id/presign", middleware, async (req, res) => {
 });
 
 
+
+
+
+
 router.get("/:id/print", middleware, async (req, res) => {
   try {
     const doc = await documentModel.findById(req.params.id);
@@ -266,6 +271,56 @@ router.get("/getCategory", async (req, res) => {
   } catch (error) {
     console.error("Fetch categories error:", error);
     res.status(500).json({ message: "Failed to fetch categories" });
+  }
+});
+
+router.get("/:id/share", middleware, async (req, res) => {
+  try {
+    const doc = await documentModel.findById(req.params.id);
+    if (!doc) return res.status(404).json({ message: "Document not found" });
+
+    // Ensure user purchased it
+    const purchased = await paymentModel.findOne({
+      userId: req.user.id,
+      documentId: doc._id,
+    });
+    if (!purchased)
+      return res.status(403).json({ message: "You haven't purchased this document" });
+
+    // Create short-lived JWT (e.g. expires in 15 minutes)
+    const token = jwt.sign(
+      { docId: doc._id },
+      process.env.JWT_SECRET,
+      { expiresIn: "15m" }
+    );
+
+    const shareUrl = `${process.env.FRONTEND_URL}/share/${token}`;
+    res.json({ shareUrl });
+  } catch (err) {
+    console.error("Error generating share link:", err);
+    res.status(500).json({ message: "Error generating share link" });
+  }
+});
+router.get("/share/:token", async (req, res) => {
+  try {
+    const { token } = req.params;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const doc = await documentModel.findById(decoded.docId);
+
+    if (!doc) return res.status(404).json({ message: "Document not found" });
+
+    const params = {
+      Bucket: process.env.S3_BUCKET,
+      Key: doc.fileKey,
+      Expires: 60 * 5, // 5 minutes
+      ResponseContentDisposition: `inline; filename="${encodeURIComponent(doc.title)}"`,
+    };
+
+    const url = s3.getSignedUrl("getObject", params);
+    res.json({ url, title: doc.title });
+  } catch (err) {
+    console.error("Error verifying share token:", err);
+    return res.status(403).json({ message: "Invalid or expired share link" });
   }
 });
 module.exports = router;
