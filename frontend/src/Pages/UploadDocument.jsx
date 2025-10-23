@@ -229,106 +229,161 @@ const [isUploading, setIsUploading] = useState(false);
                     {/* File Uploads */}
                     <div className="space-y-4">
                       {/* PDF Upload */}
-                      <div className="space-y-2">
-                        <label htmlFor="pdf" className="block text-sm font-semibold text-gray-700">
-                          PDF Document <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative"   onDragOver={(e) => e.preventDefault()}
-  onDrop={(e) => {
-    e.preventDefault();
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const droppedFile = e.dataTransfer.files[0];
-      if (droppedFile.type === "application/pdf") {
-        setFile(droppedFile);
-      } else {
-        alert("Please drop a PDF file");
+                     <div className="space-y-2 relative">
+  <label htmlFor="pdf" className="block text-sm font-semibold text-gray-700">
+    PDF Document <span className="text-red-500">*</span>
+  </label>
+  <div
+    className="relative"
+    onDragOver={(e) => e.preventDefault()}
+    onDrop={(e) => {
+      e.preventDefault();
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        const droppedFile = e.dataTransfer.files[0];
+        if (droppedFile.type === "application/pdf") {
+          setFile(droppedFile);
+        } else {
+          alert("Please drop a PDF file");
+        }
       }
-    }
-  }}>
-                          <input
-                            id="pdf"
-                            type="file"
-                            accept="application/pdf"
-                            onChange={(e) => setFile(e.target.files?.[0] || null)}
-                          
-                            className="hidden"
-                          />
-                          <label
-                            htmlFor="pdf"
-                            className={`flex items-center justify-center gap-3 w-full px-6 py-4 rounded-xl border-2 border-dashed transition-all cursor-pointer ${
-                              file 
-                                ? 'border-blue-500 bg-blue-50' 
-                                : 'border-gray-300 bg-gray-50 hover:border-blue-400 hover:bg-blue-50'
-                            } ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                          >
-                            <svg className={`w-6 h-6 ${file ? 'text-blue-600' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                            </svg>
-                            <div className="text-left">
-                              <p className={`font-semibold ${file ? 'text-blue-700' : 'text-gray-700'}`}>
-                                {file ? file.name : 'Click to upload PDF'}
-                              </p>
-                              {!file && (
-                                <p className="text-xs text-gray-500 mt-1">
-                                  PDF files only
-                                </p>
-                              )}
-                            </div>
-                          </label>
-                        </div>
-                      </div>
+    }}
+  >
+    {/* Hidden Input */}
+    <input
+      id="pdf"
+      type="file"
+      accept="application/pdf"
+      onChange={(e) => setFile(e.target.files?.[0] || null)}
+      className="hidden"
+    />
+
+    {/* Upload Box */}
+    <label
+      htmlFor="pdf"
+      className={`relative flex items-center justify-center gap-3 w-full px-6 py-4 rounded-xl border-2 border-dashed transition-all cursor-pointer ${
+        file
+          ? "border-blue-500 bg-blue-50"
+          : "border-gray-300 bg-gray-50 hover:border-blue-400 hover:bg-blue-50"
+      } ${isUploading ? "opacity-50 cursor-not-allowed" : ""}`}
+    >
+      <svg
+        className={`w-6 h-6 ${file ? "text-blue-600" : "text-gray-400"}`}
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+        />
+      </svg>
+      <div className="text-left">
+        <p className={`font-semibold ${file ? "text-blue-700" : "text-gray-700"}`}>
+          {file ? file.name : "Click to upload PDF"}
+        </p>
+        {!file && <p className="text-xs text-gray-500 mt-1">PDF files only</p>}
+      </div>
+
+      {/* ❌ Clear Button */}
+      {file && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            setFile(null);
+          }}
+          className="absolute -top-4 -right-1 text-black rounded-full text-3xl flex items-center justify-center"
+        >
+          ×
+        </button>
+      )}
+    </label>
+  </div>
+</div>
+
 
                       {/* Thumbnail Upload */}
-                      <div className="space-y-2">
-                        <label htmlFor="thumbnail" className="block text-sm font-semibold text-gray-700">
-                          Thumbnail Image <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative"   onDragOver={(e) => e.preventDefault()}
-  onDrop={(e) => {
-    e.preventDefault();
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const droppedFile = e.dataTransfer.files[0];
-      if (droppedFile.type.startsWith("image/")) {
-        setThumbnail(droppedFile);
-        setPreview(URL.createObjectURL(droppedFile));
-      } else {
-        alert("Please drop an image file");
+                   <div className="space-y-2 relative">
+  <label htmlFor="thumbnail" className="block text-sm font-semibold text-gray-700">
+    Thumbnail Image <span className="text-red-500">*</span>
+  </label>
+  <div
+    className="relative"
+    onDragOver={(e) => e.preventDefault()}
+    onDrop={(e) => {
+      e.preventDefault();
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        const droppedFile = e.dataTransfer.files[0];
+        if (droppedFile.type.startsWith("image/")) {
+          setThumbnail(droppedFile);
+          setPreview(URL.createObjectURL(droppedFile));
+        } else {
+          alert("Please drop an image file");
+        }
       }
-    }
-  }}>
-                          <input
-                            id="thumbnail"
-                            type="file"
-                            accept="image/*"
-                            onChange={handleThumbnailChange}
-                        
-                            disabled={isUploading}
-                            className="hidden"
-                          />
-                          <label
-                            htmlFor="thumbnail"
-                            className={`flex items-center justify-center gap-3 w-full px-6 py-4 rounded-xl border-2 border-dashed transition-all cursor-pointer ${
-                              thumbnail 
-                                ? 'border-blue-500 bg-blue-50' 
-                                : 'border-gray-300 bg-gray-50 hover:border-blue-400 hover:bg-blue-50'
-                            } ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                          >
-                            <svg className={`w-6 h-6 ${thumbnail ? 'text-blue-600' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            <div className="text-left">
-                              <p className={`font-semibold ${thumbnail ? 'text-blue-700' : 'text-gray-700'}`}>
-                                {thumbnail ? thumbnail.name : 'Click to upload thumbnail'}
-                              </p>
-                              {!thumbnail && (
-                                <p className="text-xs text-gray-500 mt-1">
-                                  JPG, PNG, GIF up to 10MB
-                                </p>
-                              )}
-                            </div>
-                          </label>
-                        </div>
-                      </div>
+    }}
+  >
+    <input
+      id="thumbnail"
+      type="file"
+      accept="image/*"
+      onChange={handleThumbnailChange}
+      disabled={isUploading}
+      className="hidden"
+    />
+
+    <label
+      htmlFor="thumbnail"
+      className={`relative flex items-center justify-center gap-3 w-full px-6 py-4 rounded-xl border-2 border-dashed transition-all cursor-pointer ${
+        thumbnail
+          ? "border-blue-500 bg-blue-50"
+          : "border-gray-300 bg-gray-50 hover:border-blue-400 hover:bg-blue-50"
+      } ${isUploading ? "opacity-50 cursor-not-allowed" : ""}`}
+    >
+      <svg
+        className={`w-6 h-6 ${thumbnail ? "text-blue-600" : "text-gray-400"}`}
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+        />
+      </svg>
+      <div className="text-left">
+        <p className={`font-semibold ${thumbnail ? "text-blue-700" : "text-gray-700"}`}>
+          {thumbnail ? thumbnail.name : "Click to upload thumbnail"}
+        </p>
+        {!thumbnail && (
+          <p className="text-xs text-gray-500 mt-1">JPG, PNG, GIF up to 10MB</p>
+        )}
+      </div>
+
+      {/* ❌ Clear Button */}
+      {thumbnail && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            setThumbnail(null);
+            setPreview(null);
+          }}
+   className="absolute -top-4 -right-1 text-black rounded-full text-3xl flex items-center justify-center"
+        >
+          ×
+        </button>
+      )}
+    </label>
+  </div>
+
+ 
+</div>
+
 
                       {/* Thumbnail Preview */}
                       {preview && (

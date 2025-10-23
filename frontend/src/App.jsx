@@ -9,6 +9,7 @@ import Layout from './Layout/Layout';
 import PageNotFound from './Pages/PageNotFound';
 import DocumentViewer from './Pages/DocumentViewer';
 import UploadDocument from './Pages/UploadDocument';
+import ShareViewer from './Pages/ShareViewer';
 
 function App() {
   return (
@@ -58,6 +59,12 @@ function App() {
                   </PrivateRoute>
                 }
               />
+              <Route path="/share/:token" element={
+                <PrivateRoute>
+                <ShareViewer />
+                </PrivateRoute>
+                } />
+
               <Route path="*" element={<PageNotFound />} />
             </Routes>
           </Layout>
