@@ -35,6 +35,10 @@ export default function AllDocuments() {
   // Active files inside folder
   const files = currentFolder ? currentFolder.files : [];
 
+  const handleDelete = (name) => {
+    alert(`Delete clicked for "${name}"`);
+  };
+
   return (
     <div className="p-4">
       {/* ===== Header ===== */}
@@ -70,10 +74,19 @@ export default function AllDocuments() {
               files.map((file, i) => (
                 <div
                   key={i}
-                  className="p-4 border border-gray-200 rounded-lg bg-white shadow-sm hover:shadow-md transition cursor-pointer flex flex-col items-start"
+                  className="p-4 border border-gray-200 rounded-lg bg-white shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-between"
                 >
-                  <FileText className="text-emerald-600 mb-2" size={24} />
-                  <div className="font-medium text-gray-800 truncate w-full">
+                  <div className="flex justify-between items-start w-full">
+                    <FileText className="text-emerald-600" size={24} />
+                    <i
+                      className="bx bx-trash text-red-500 text-xl hover:text-red-600 transition cursor-pointer"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(file.name);
+                      }}
+                    ></i>
+                  </div>
+                  <div className="mt-2 font-medium text-gray-800 truncate w-full">
                     {file.name}
                   </div>
                   <div className="text-xs text-gray-500 mt-1">
@@ -86,10 +99,21 @@ export default function AllDocuments() {
                 <div
                   key={i}
                   onClick={() => setCurrentFolder(folder)}
-                  className="p-4 border border-gray-200 rounded-lg bg-white shadow-sm hover:shadow-md transition cursor-pointer flex flex-col items-start"
+                  className="p-4 border border-gray-200 rounded-lg bg-white shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-between"
                 >
-                  <Folder className="text-emerald-600 mb-2" size={24} />
-                  <div className="font-medium text-gray-800">{folder.name}</div>
+                  <div className="flex justify-between items-start w-full">
+                    <Folder className="text-emerald-600" size={24} />
+                    <i
+                      className="bx bx-trash text-red-500 text-xl hover:text-red-600 transition cursor-pointer"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(folder.name);
+                      }}
+                    ></i>
+                  </div>
+                  <div className="mt-2 font-medium text-gray-800">
+                    {folder.name}
+                  </div>
                   <div className="text-xs text-gray-500 mt-1">
                     {folder.files.length} files
                   </div>
@@ -110,6 +134,9 @@ export default function AllDocuments() {
               <th className="px-4 py-2 text-left text-sm text-gray-600">
                 {currentFolder ? "Date Created" : "Type"}
               </th>
+              <th className="px-4 py-2 text-center text-sm text-gray-600">
+                Action
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -125,6 +152,15 @@ export default function AllDocuments() {
                     </td>
                     <td className="px-4 py-2 text-gray-600">{file.size}</td>
                     <td className="px-4 py-2 text-gray-600">{file.created}</td>
+                    <td className="px-4 py-2 text-center">
+                      <i
+                        className="bx bx-trash text-red-500 text-xl hover:text-red-600 transition cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(file.name);
+                        }}
+                      ></i>
+                    </td>
                   </tr>
                 ))
               : folders.map((folder, i) => (
@@ -141,6 +177,15 @@ export default function AllDocuments() {
                       {folder.files.length} files
                     </td>
                     <td className="px-4 py-2 text-gray-600">Folder</td>
+                    <td className="px-4 py-2 text-center">
+                      <i
+                        className="bx bx-trash text-red-500 text-xl hover:text-red-600 transition cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(folder.name);
+                        }}
+                      ></i>
+                    </td>
                   </tr>
                 ))}
           </tbody>
