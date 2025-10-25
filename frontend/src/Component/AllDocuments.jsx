@@ -1,63 +1,95 @@
 // src/Pages/AllDocuments.jsx
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { List, Grid, Folder, FileText, ArrowLeft } from "lucide-react";
+import api from "../services/api";
+import { Toaster, toast } from 'sonner';
 
 export default function AllDocuments() {
   const [view, setView] = useState("grid");
+  const [categories, setCategories] = useState([]);
+  const [files, setFiles] = useState([]);
   const [currentFolder, setCurrentFolder] = useState(null);
-
+  const [loading, setLoading] = useState(false);
   // === Folder and File Data ===
-  const folders = [
-    {
-      name: "Finance",
-      files: [
-        { name: "Invoice_July.pdf", size: "2.4 MB", created: "2025-07-12" },
-        { name: "Expense_Report.xlsx", size: "1.8 MB", created: "2025-07-30" },
-      ],
-    },
-    {
-      name: "Projects",
-      files: [
-        { name: "Project_Plan.docx", size: "1.2 MB", created: "2025-06-05" },
-        { name: "Presentation.pptx", size: "3.1 MB", created: "2025-09-10" },
-        { name: "Client_Contract.pdf", size: "4.8 MB", created: "2025-08-21" },
-      ],
-    },
-    {
-      name: "HR",
-      files: [
-        { name: "Employee_List.csv", size: "560 KB", created: "2025-05-12" },
-        { name: "Leave_Record.pdf", size: "980 KB", created: "2025-04-23" },
-      ],
-    },
-  ];
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
-  // Active files inside folder
-  const files = currentFolder ? currentFolder.files : [];
-
-  const handleDelete = (name) => {
-    alert(`Delete clicked for "${name}"`);
+  const fetchCategories = async () => {
+    try {
+      setLoading(true);
+      const res = await api.get("/api/v1/doc/categories/list");
+      setCategories(res.data);
+    } catch (error) {
+      console.error("Failed to load categories:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
+  const fetchDocuments = async (category) => {
+    try {
+      setLoading(true);
+      const res = await api.get(
+        `/api/v1/doc/documents/${category._id}`
+      );
+      setFiles(res.data);
+      setCurrentFolder(category);
+    } catch (error) {
+      console.error("Failed to load documents:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+ const handleDelete = async (item, type) => {
+  const name = type === "folder" ? item.categoryName : item.title;
+  if (!window.confirm(`Delete ${type} "${name}"?`)) return;
+
+  try {
+    setLoading(true);
+    toast.loading(`Deleting ${type}...`, { id: "delete" });
+
+    // unified delete route
+    await api.delete(`/api/v1/doc/delete/${type}/${item._id}`);
+
+    if (type === "folder") {
+      fetchCategories(); // reload category list
+      toast.success(`Folder "${name}" and its files deleted`, { id: "delete" });
+    } else {
+      fetchDocuments(currentFolder);
+      toast.success(`File "${name}" deleted`, { id: "delete" });
+    }
+  } catch (error) {
+    console.error(error);
+    toast.error(`Failed to delete ${type}`, { id: "delete" });
+  } finally {
+    setLoading(false);
+  }
+};
+
   return (
-    <div className="p-4">
+     <div className="p-4">
+      <Toaster/>
       {/* ===== Header ===== */}
       <div className="flex justify-between items-center mb-5">
         <div className="flex items-center gap-3">
           {currentFolder && (
             <button
-              onClick={() => setCurrentFolder(null)}
+              onClick={() => {
+                setCurrentFolder(null);
+                setFiles([]);
+              }}
               className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition"
             >
               <ArrowLeft size={18} />
             </button>
           )}
           <h2 className="text-lg font-semibold text-gray-800">
-            {currentFolder ? currentFolder.name : "All Documents"}
+            {currentFolder ? currentFolder.categoryName : "All Documents"}
           </h2>
         </div>
 
-        {/* View Toggle */}
         <button
           onClick={() => setView(view === "grid" ? "list" : "grid")}
           className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
@@ -66,14 +98,16 @@ export default function AllDocuments() {
         </button>
       </div>
 
-      {/* ===== GRID VIEW ===== */}
-      {view === "grid" ? (
+      {/* ===== Content ===== */}
+      {loading ? (
+        <div className="text-center text-gray-500 py-10">Loading...</div>
+      ) : view === "grid" ? (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {currentFolder
-            ? // Inside folder: show files
-              files.map((file, i) => (
+            ? // Inside folder — show files
+              files.map((file) => (
                 <div
-                  key={i}
+                  key={file._id}
                   className="p-4 border border-gray-200 rounded-lg bg-white shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-between"
                 >
                   <div className="flex justify-between items-start w-full">
@@ -82,23 +116,24 @@ export default function AllDocuments() {
                       className="bx bx-trash text-red-500 text-xl hover:text-red-600 transition cursor-pointer"
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleDelete(file.name);
+                        handleDelete(file, "file");
                       }}
                     ></i>
                   </div>
                   <div className="mt-2 font-medium text-gray-800 truncate w-full">
-                    {file.name}
+                    {file.title}
                   </div>
                   <div className="text-xs text-gray-500 mt-1">
-                    {file.size} • {file.created}
+                    {file.type || "—"} •{" "}
+                    {new Date(file.createdAt).toLocaleDateString()}
                   </div>
                 </div>
               ))
-            : // Outside folder: show folder list
-              folders.map((folder, i) => (
+            : // Outside folder — show categories
+              categories.map((category) => (
                 <div
-                  key={i}
-                  onClick={() => setCurrentFolder(folder)}
+                  key={category._id}
+                  onClick={() => fetchDocuments(category)}
                   className="p-4 border border-gray-200 rounded-lg bg-white shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-between"
                 >
                   <div className="flex justify-between items-start w-full">
@@ -107,32 +142,26 @@ export default function AllDocuments() {
                       className="bx bx-trash text-red-500 text-xl hover:text-red-600 transition cursor-pointer"
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleDelete(folder.name);
+                        handleDelete(category, "folder");
                       }}
                     ></i>
                   </div>
                   <div className="mt-2 font-medium text-gray-800">
-                    {folder.name}
-                  </div>
-                  <div className="text-xs text-gray-500 mt-1">
-                    {folder.files.length} files
+                    {category.categoryName}
                   </div>
                 </div>
               ))}
         </div>
       ) : (
-        // ===== LIST VIEW =====
+        // ===== List View =====
         <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-sm">
           <thead className="bg-gray-100">
             <tr>
               <th className="px-4 py-2 text-left text-sm text-gray-600">
-                {currentFolder ? "File Name" : "Folder Name"}
+                {currentFolder ? "File Name" : "Category Name"}
               </th>
               <th className="px-4 py-2 text-left text-sm text-gray-600">
-                {currentFolder ? "Size" : "Items"}
-              </th>
-              <th className="px-4 py-2 text-left text-sm text-gray-600">
-                {currentFolder ? "Date Created" : "Type"}
+                {currentFolder ? "Type" : "Created"}
               </th>
               <th className="px-4 py-2 text-center text-sm text-gray-600">
                 Action
@@ -141,48 +170,46 @@ export default function AllDocuments() {
           </thead>
           <tbody>
             {currentFolder
-              ? files.map((file, i) => (
+              ? files.map((file) => (
                   <tr
-                    key={i}
+                    key={file._id}
                     className="border-t border-gray-100 hover:bg-gray-50 cursor-pointer"
                   >
                     <td className="px-4 py-2 flex items-center gap-2 text-gray-800">
                       <FileText className="text-emerald-600" size={16} />
-                      {file.name}
+                      {file.title}
                     </td>
-                    <td className="px-4 py-2 text-gray-600">{file.size}</td>
-                    <td className="px-4 py-2 text-gray-600">{file.created}</td>
+                    <td className="px-4 py-2 text-gray-600">{file.type}</td>
                     <td className="px-4 py-2 text-center">
                       <i
                         className="bx bx-trash text-red-500 text-xl hover:text-red-600 transition cursor-pointer"
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleDelete(file.name);
+                          handleDelete(file, "file");
                         }}
                       ></i>
                     </td>
                   </tr>
                 ))
-              : folders.map((folder, i) => (
+              : categories.map((cat) => (
                   <tr
-                    key={i}
-                    onClick={() => setCurrentFolder(folder)}
+                    key={cat._id}
+                    onClick={() => fetchDocuments(cat)}
                     className="border-t border-gray-100 hover:bg-gray-50 cursor-pointer"
                   >
                     <td className="px-4 py-2 flex items-center gap-2 text-gray-800">
                       <Folder className="text-emerald-600" size={16} />
-                      {folder.name}
+                      {cat.categoryName}
                     </td>
                     <td className="px-4 py-2 text-gray-600">
-                      {folder.files.length} files
+                      {new Date(cat.createdAt).toLocaleDateString()}
                     </td>
-                    <td className="px-4 py-2 text-gray-600">Folder</td>
                     <td className="px-4 py-2 text-center">
                       <i
                         className="bx bx-trash text-red-500 text-xl hover:text-red-600 transition cursor-pointer"
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleDelete(folder.name);
+                          handleDelete(cat, "folder");
                         }}
                       ></i>
                     </td>

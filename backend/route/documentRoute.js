@@ -14,6 +14,24 @@ const s3 = new AWS.S3({
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
 });
 
+
+const MAIN_BUCKET = process.env.S3_BUCKET;
+const BACKUP_BUCKET = process.env.S3_BACKUP_BUCKET;
+const deleteFromS3 = async (key, bucket) => {
+  if (!key || !bucket) return;
+  try {
+    await s3
+      .deleteObject({
+        Bucket: bucket,
+        Key: key,
+      })
+      .promise();
+    console.log(`Deleted ${key} from ${bucket}`);
+  } catch (err) {
+    console.error(`Failed to delete ${key} from ${bucket}:`, err.message);
+  }
+};
+
 router.post("/presign", middleware, async (req, res) => {
   try {
     const { filename, filetype } = req.body;
@@ -323,4 +341,115 @@ router.get("/share/:token", async (req, res) => {
     return res.status(403).json({ message: "Invalid or expired share link" });
   }
 });
+
+router.get("/categories/list", async (req, res) => {
+   try {
+    const categories = await categoryModel.find();
+    res.json(categories);
+  } catch (error) {
+    console.log("error",error);
+    res.status(500).json({ error: "Failed to fetch categories" });
+  }
+ }
+);
+router.get("/documents/:categoryId", async (req, res) => {
+  try {
+    const docs = await documentModel.find({ category: req.params.categoryId });
+    res.json(docs);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch documents" });
+  }
+});
+
+// router.delete("/document/:id", async (req, res) => {
+//   try {
+//     const doc = await documentModel.findById(req.params.id);
+//     if (!doc) return res.status(404).json({ error: "Document not found" });
+
+//     // Delete from S3 buckets
+//     if (doc.fileKey) {
+//       await deleteFromS3(MAIN_BUCKET, doc.fileKey);
+//       await deleteFromS3(BACKUP_BUCKET, doc.fileKey);
+//     }
+
+//     // Delete from MongoDB
+//     await doc.deleteOne();
+
+//     res.json({ success: true, message: "Document deleted successfully" });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: "Failed to delete document" });
+//   }
+// });
+
+// // === DELETE a category and all related documents ===
+// router.delete("/category/:id", async (req, res) => {
+//   try {
+//     const category = await categoryModel.findById(req.params.id);
+//     if (!category) return res.status(404).json({ error: "Category not found" });
+
+//     // Find all documents linked to this category
+//     const docs = await documentModel.find({ category: req.params.id });
+
+//     // Delete each document from MongoDB and S3
+//     for (const doc of docs) {
+//       if (doc.fileKey) {
+//         await deleteFromS3(MAIN_BUCKET, doc.fileKey);
+//         await deleteFromS3(BACKUP_BUCKET, doc.fileKey);
+//       }
+//       await doc.deleteOne();
+//     }
+
+//     // Delete the category
+//     await category.deleteOne();
+
+//     res.json({
+//       success: true,
+//       message: `Category "${category.categoryName}" and its files deleted.`,
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: "Failed to delete category" });
+//   }
+// });
+router.delete("/delete/:type/:id", async (req, res) => {
+  const { type, id } = req.params;
+
+  try {
+    if (type === "folder") {
+      // Delete all files in this category
+      const docs = await documentModel.find({ category: id });
+
+      for (const doc of docs) {
+        // Delete file from both main and backup S3 buckets
+        await deleteFromS3(doc.fileKey, MAIN_BUCKET);
+        await deleteFromS3(doc.fileKey, BACKUP_BUCKET);
+
+        await doc.deleteOne();
+      }
+
+      // Delete the category
+      await categoryModel.findByIdAndDelete(id);
+
+      return res.status(200).json({ message: "Folder and its files deleted" });
+    } else if (type === "file") {
+      const doc = await documentModel.findById(id);
+      if (!doc) return res.status(404).json({ message: "File not found" });
+
+      await deleteFromS3(doc.fileKey, MAIN_BUCKET);
+      await deleteFromS3(doc.fileKey, BACKUP_BUCKET);
+
+      await doc.deleteOne();
+
+      return res.status(200).json({ message: "File deleted" });
+    } else {
+      return res.status(400).json({ message: "Invalid delete type" });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error deleting item", error: err.message });
+  }
+});
+
+
 module.exports = router;
