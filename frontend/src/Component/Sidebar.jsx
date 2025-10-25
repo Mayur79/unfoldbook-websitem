@@ -85,19 +85,6 @@ export default function Sidebar({ active, onNavigate }) {
             onClick={() => onNavigate("alldocuments")}
           />
         </nav>
-
-        {/* Divider: Products */}
-        <div className="mt-6 border-t border-gray-100 pt-3">
-          <p className="text-xs text-gray-400 uppercase tracking-wide mb-1 px-2">
-            Products
-          </p>
-          <button className="w-full text-left px-3 py-2 rounded-lg text-gray-600 text-sm hover:bg-gray-50 hover:text-gray-900 transition">
-            All Documents
-          </button>
-          <button className="w-full text-left px-3 py-2 rounded-lg text-gray-600 text-sm hover:bg-gray-50 hover:text-gray-900 transition">
-            Upload
-          </button>
-        </div>
       </div>
 
       {/* Bottom Section */}
