@@ -34,7 +34,9 @@ function App() {
               <Route path="/" element={<Navigate to="/document" replace />} />
               <Route path="/login" element={<Login />} />
 
-              <Route path="/admin" element={<Admin />} />
+              <Route path="/admin" element={
+                   <PrivateRoute><Admin />
+                   </PrivateRoute>} />
               <Route
                 path="/dashboard"
                 element={
