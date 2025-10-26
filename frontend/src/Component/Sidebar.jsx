@@ -1,19 +1,22 @@
 // src/components/Sidebar.jsx
 import React from "react";
+import { NavLink } from "react-router-dom";
 
 // Individual Navigation Item
-const NavItem = ({ icon, label, active, onClick }) => (
-  <button
-    onClick={onClick}
-    className={`flex items-center gap-3 w-full text-left px-3 py-2.5 rounded-xl transition-all duration-150 ${
-      active
-        ? "bg-emerald-50 text-emerald-700 font-semibold shadow-sm"
-        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-    }`}
+const NavItem = ({to, icon, label }) => (
+   <NavLink
+    to={to}
+    className={({ isActive }) =>
+      `flex items-center gap-3 w-full text-left px-3 py-2.5 rounded-xl transition-all duration-150 ${
+        isActive
+          ? "bg-emerald-50 text-emerald-700 font-semibold shadow-sm"
+          : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+      }`
+    }
   >
     <span className="flex items-center justify-center w-5 h-5">{icon}</span>
     <span className="text-sm tracking-wide">{label}</span>
-  </button>
+  </NavLink>
 );
 
 export default function Sidebar({ active, onNavigate }) {
@@ -61,28 +64,34 @@ export default function Sidebar({ active, onNavigate }) {
         {/* Navigation */}
         <nav className="space-y-1">
           <NavItem
+           to="/admin/dashboard"
             icon={DashboardIcon}
             label="Dashboard"
-            active={active === "dashboard"}
-            onClick={() => onNavigate("dashboard")}
+           
           />
           <NavItem
+          to="/admin/roles"
             icon={RolesIcon}
             label="Roles"
-            active={active === "roles"}
-            onClick={() => onNavigate("roles")}
+           
           />
           <NavItem
+          to="/admin/customers" 
             icon={CustomersIcon}
             label="Customers"
-            active={active === "customers"}
-            onClick={() => onNavigate("customers")}
+            
           />
           <NavItem
+          to="/admin/alldocuments"
             icon={DocumentsIcon}
             label="All Documents"
-            active={active === "alldocuments"}
-            onClick={() => onNavigate("alldocuments")}
+            
+          />
+          <NavItem
+          to="/admin/upload-document"
+            icon={DocumentsIcon}
+            label="Upload Document"
+            
           />
         </nav>
       </div>

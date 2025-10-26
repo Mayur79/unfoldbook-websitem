@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import api from "../services/api";
-import Sidebar from "../Component/Sidebar";
 
 const UploadDocument = () => {
   const [file, setFile] = useState(null);
@@ -83,7 +82,7 @@ const UploadDocument = () => {
 
   return (
     <div className="flex bg-gray-50 min-h-screen">
-      <Sidebar />
+    
       <main className="flex-1 p-8 overflow-auto">
         <h2 className="text-2xl font-bold text-gray-800 mb-8">
           Upload New Document

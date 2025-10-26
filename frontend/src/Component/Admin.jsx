@@ -1,43 +1,19 @@
 // src/components/Admin.jsx
-import React, { useState } from "react";
+import React from "react";
+import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
-import Dashboard from "./Dashboard";
-import RolePage from "./RolePage";
-import Customer from "./Customer";
-import AllDocuments from "./AllDocuments";
+import Layout from "../Layout/Layout";
 
 export default function Admin() {
-  const [active, setActive] = useState("dashboard");
-
-  const renderPage = () => {
-    switch (active) {
-      case "dashboard":
-        return <Dashboard />;
-      case "roles":
-        return <RolePage />;
-      case "customers":
-        return <Customer />;
-      case "alldocuments":
-        return <AllDocuments />;
-      default:
-        return <Dashboard />;
-    }
-  };
-
   return (
+      <Layout>
     <div className="min-h-screen flex bg-gray-50">
-      {/* Sidebar */}
-      <Sidebar active={active} onNavigate={setActive} />
-
-      {/* Main Content Area */}
+    
+      <Sidebar />
       <main className="flex-1 p-6 overflow-auto transition-all">
-        
-
-        {/* Page Content */}
-        <section >
-          {renderPage()}
-        </section>
+        <Outlet />
       </main>
     </div>
+    </Layout>
   );
 }

@@ -2,7 +2,7 @@ import './App.css';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import PrivateRoute from './services/PrivateRoute';
 import Dashboard from './Pages/Dashboard';
-import Login from './Pages/Login';
+// import Login from './Pages/Login';
 import Admin from './Component/Admin';
 import Documents from './Pages/Document';
 import Layout from './Layout/Layout';
@@ -10,16 +10,30 @@ import PageNotFound from './Pages/PageNotFound';
 import DocumentViewer from './Pages/DocumentViewer';
 import UploadDocument from './Pages/UploadDocument';
 import ShareViewer from './Pages/ShareViewer';
-
+import LoginModal from './Pages/Login';
+import { useState } from 'react';
+import AdminDashboard from './Component/AdminDashboard';
+import RolePage from './Component/RolePage';
+import Customer from "./Component/Customer";
+import AllDocument from "./Component/AllDocuments";
 function App() {
+
+   const [showLoginModal, setShowLoginModal] = useState(false);
   return (
+<>
+   <LoginModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+      />
+
+
     <Routes>
    
     
       <Route
         path="/viewer/:docId"
         element={
-          <PrivateRoute>
+           <PrivateRoute openLoginModal={() => setShowLoginModal(true)}>
             <DocumentViewer />
           </PrivateRoute>
         }
@@ -32,15 +46,15 @@ function App() {
           <Layout>
             <Routes>
               <Route path="/" element={<Navigate to="/document" replace />} />
-              <Route path="/login" element={<Login />} />
+              {/* <Route path="/login" element={<Login />} /> */}
 
               <Route path="/admin" element={
-                   <PrivateRoute><Admin />
+                      <PrivateRoute openLoginModal={() => setShowLoginModal(true)}><Admin />
                    </PrivateRoute>} />
               <Route
                 path="/dashboard"
                 element={
-                  <PrivateRoute>
+                     <PrivateRoute openLoginModal={() => setShowLoginModal(true)}>
                     <Dashboard />
                   </PrivateRoute>
                 }
@@ -48,21 +62,21 @@ function App() {
               <Route
                 path="/document"
                 element={
-                  <PrivateRoute>
+                
                     <Documents />
-                  </PrivateRoute>
+               
                 }
               />
-              <Route
+              {/* <Route
                 path="/upload-document"
                 element={
-                  <PrivateRoute>
+                     <PrivateRoute openLoginModal={() => setShowLoginModal(true)}>
                     <UploadDocument />
                   </PrivateRoute>
                 }
-              />
+              /> */}
               <Route path="/share/:token" element={
-                <PrivateRoute>
+                 <PrivateRoute openLoginModal={() => setShowLoginModal(true)}>
                 <ShareViewer />
                 </PrivateRoute>
                 } />
@@ -72,7 +86,19 @@ function App() {
           </Layout>
         }
       />
+        <Route path="/admin" element={<Admin />}>
+         <Route index element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="roles" element={<RolePage />} />
+          <Route path="customers" element={<Customer />} />
+          <Route path="alldocuments" element={<AllDocument  />} />
+          <Route path="upload-document" element={<UploadDocument  />} />
+         
+      
+        </Route>
     </Routes>
+    </>
+    
   );
 }
 

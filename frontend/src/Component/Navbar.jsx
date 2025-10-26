@@ -1,15 +1,24 @@
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Menu, X } from "lucide-react";
+import LoginModal from "../Pages/Login";
+import { toast } from "sonner";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const { user, logout } = useAuth();
-
+const [showLoginModal, setShowLoginModal] = useState(false);
   return (
+    <>
+   <LoginModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+      />
     <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm">
+       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
+        
         {/* Logo */}
         <a href="/" className="flex items-center gap-2">
           <img
@@ -81,12 +90,18 @@ const Navbar = () => {
               )}
             </div>
           ) : (
-            <a
-              href="/login"
+            <button
+             onClick={()=>{
+                 if (!user) {
+    toast.success("You must log in to buy this document."); 
+    setShowLoginModal(true);
+    return;
+  }
+             }}
               className="text-sm font-medium text-gray-700 hover:text-emerald-600 transition"
             >
               Login
-            </a>
+            </button>
           )}
 
           {/* Mobile Menu Button */}
@@ -117,6 +132,7 @@ const Navbar = () => {
         </div>
       )}
     </nav>
+    </>
   );
 };
 

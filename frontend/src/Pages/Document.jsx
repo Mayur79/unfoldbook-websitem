@@ -3,16 +3,19 @@ import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import pdfimage from "../assets/pdfimage.png";
 import { useNavigate } from 'react-router-dom';
+import { Toaster, toast } from 'sonner';
+import LoginModal from '../Pages/Login';
 export default function Documents() {
   const [docs, setDocs] = useState([]);
   const [purchased, setPurchased] = useState([]);
+const [showLoginModal, setShowLoginModal] = useState(false);
 
   const navigate = useNavigate();
   const {user}=useAuth();
-  useEffect(() => {
-    loadDocs();
-    loadPurchased(); 
-  }, []);
+ useEffect(() => {
+  loadDocs();
+  if (user) loadPurchased();
+}, [user]);
 
   async function loadDocs() {
     const res = await api.get('/api/v1/doc');
@@ -29,6 +32,11 @@ export default function Documents() {
     }
   }
   async function buy(doc) {
+     if (!user) {
+    toast.success("You must log in to buy this document."); 
+    setShowLoginModal(true);
+    return;
+  }
     const { data } = await api.post('/api/v1/pay/order', { documentId: doc._id });
     const { order, key } = data;
 console.log("data",data);
@@ -109,6 +117,10 @@ async function share(doc) {
 
   return (
       <div className="font-poppins px-3 sm:px-8 py-6">
+        <LoginModal
+  isOpen={showLoginModal}
+  onClose={() => setShowLoginModal(false)}
+/>
     <div className="text-center mb-8 sm:mb-12">
       <h2 className="text-2xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#4f46e5] to-[#22c55e]">
         Explore Premium Documents

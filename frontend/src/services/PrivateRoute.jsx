@@ -1,14 +1,18 @@
 // PrivateRoute.jsx
-import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import React, { useEffect } from "react";
 
-export default function PrivateRoute({ children }) {
-  const token = localStorage.getItem('token');
-  const location = useLocation();
+export default function PrivateRoute({ children, openLoginModal }) {
+  const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    if (!token && openLoginModal) {
+      openLoginModal();
+    }
+  }, [token, openLoginModal]);
 
   if (!token) {
-    // Save the current path so we can redirect after login
-    return <Navigate to="/login" replace state={{ from: location }} />;
+    // Don't render the protected content
+    return null;
   }
 
   return children;
