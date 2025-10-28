@@ -31,7 +31,7 @@ const [showLoginModal, setShowLoginModal] = useState(false);
 
         {/* Desktop Menu */}
         <ul className="hidden md:flex space-x-8 text-sm font-medium">
-          {["Home", "About", "Services", "Pricing", "Contact"].map((item) => (
+          {["Home", "About", "Services", "Contact"].map((item) => (
             <li key={item}>
               <a
                 href="#"
@@ -118,7 +118,7 @@ const [showLoginModal, setShowLoginModal] = useState(false);
       {isMenuOpen && (
         <div className="md:hidden border-t border-gray-100 bg-white shadow-sm">
           <ul className="flex flex-col p-4 space-y-2">
-            {["Home", "About", "Services", "Pricing", "Contact"].map((item) => (
+            {["Home", "About", "Services", "Contact"].map((item) => (
               <li key={item}>
                 <a
                   href="#"
