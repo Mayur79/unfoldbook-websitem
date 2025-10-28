@@ -45,7 +45,7 @@ function App() {
         element={
           <Layout>
             <Routes>
-              <Route path="/" element={<Navigate to="/document" replace />} />
+              <Route path="/" element={<Navigate to="/home" replace />} />
               {/* <Route path="/login" element={<Login />} /> */}
 
               <Route path="/admin" element={
@@ -60,7 +60,7 @@ function App() {
                 }
               />
               <Route
-                path="/document"
+                path="/home"
                 element={
                 
                     <Documents />

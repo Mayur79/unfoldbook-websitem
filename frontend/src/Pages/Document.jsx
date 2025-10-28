@@ -123,10 +123,10 @@ async function share(doc) {
 />
     <div className="text-center mb-8 sm:mb-12">
       <h2 className="text-2xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#4f46e5] to-[#22c55e]">
-        Explore Premium Documents
+       Buy - Download - Print
       </h2>
       <p className="text-[#64748b] mt-2 text-xs sm:text-sm">
-        Browse, preview, and buy high-quality notes, reports, and guides.
+      Anytime, Anywhere, <span className='font-bold'>Get 100% Success</span>. All the Best!
       </p>
     </div>
 

@@ -15,7 +15,7 @@ const [showLoginModal, setShowLoginModal] = useState(false);
         isOpen={showLoginModal}
         onClose={() => setShowLoginModal(false)}
       />
-    <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm">
+    <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm font-poppins">
        
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
         
@@ -26,7 +26,7 @@ const [showLoginModal, setShowLoginModal] = useState(false);
             className="h-8"
             alt="DocBuy Logo"
           />
-          <span className="text-xl font-semibold text-gray-800">DocBuy</span>
+          <span className="text-xl font-semibold text-gray-800">UnfoldBook</span>
         </a>
 
         {/* Desktop Menu */}
