@@ -1,19 +1,19 @@
 const express = require("express");
 const dotenv = require("dotenv");
-const connectDB = require("./database/db.js");
+const connectDB = require("../database/db.js");
 const cors = require("cors");
 const app = express();
-const authRoute = require("./route/authRoute.js");
+const authRoute = require("../route/authRoute.js");
 const morgan = require("morgan");
-const userRoute = require("./route/userRoute");
+const userRoute = require("../route/userRoute.js");
 
 
 // const productRoute = require("../routes/productRoute.js");
 const bodyParser = require("body-parser");
-const paymentRote = require("./route/paymentRoute.js");
-const documentRoute = require("./route/documentRoute.js");
-const seed = require("./uti/demoUser.js");
-const seedDoc = require("./uti/demoDoc.js");
+const paymentRote = require("../route/paymentRoute.js");
+const documentRoute = require("../route/documentRoute.js");
+const seed = require("../uti/demoUser.js");
+const seedDoc = require("../uti/demoDoc.js");
 dotenv.config();
 let isDBConnected = false;
 app.use(

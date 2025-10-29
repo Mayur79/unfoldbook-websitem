@@ -8,6 +8,7 @@ const multer = require("multer");
 const categoryModel = require("../model/categoryModel");
 const upload = multer({ storage: multer.memoryStorage() });
 const jwt=require("jsonwebtoken");
+const adminMiddleware = require("../middleware/adminMiddleware");
 const s3 = new AWS.S3({
   region: process.env.AWS_REGION,
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -268,7 +269,7 @@ router.get("/:id/print", middleware, async (req, res) => {
   }
 });
 
-router.post("/createCategory", async (req, res) => {
+router.post("/createCategory",middleware,adminMiddleware, async (req, res) => {
   try {
     const { categoryName } = req.body;
     if (!categoryName) return res.status(400).json({ message: "Category name is required" });
@@ -281,6 +282,22 @@ router.post("/createCategory", async (req, res) => {
   }
 });
 
+router.delete("/deleteCategory/:id",middleware,adminMiddleware ,async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deletedCategory = await categoryModel.findByIdAndDelete(id);
+
+    if (!deletedCategory) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+
+    res.status(200).json({ message: "Category deleted successfully" });
+  } catch (error) {
+    console.error("Category deletion error:", error);
+    console.log("Category deletion error:", error);
+    res.status(500).json({ message: "Failed to delete category" });
+  }
+});
 // ✅ Get all categories
 router.get("/getCategory", async (req, res) => {
   try {

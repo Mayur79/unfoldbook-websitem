@@ -5,11 +5,12 @@ import pdfimage from "../assets/pdfimage.png";
 import { useNavigate } from 'react-router-dom';
 import { Toaster, toast } from 'sonner';
 import LoginModal from '../Pages/Login';
+import SignupModal from '../Pages/SignupModal';
 export default function Documents() {
   const [docs, setDocs] = useState([]);
   const [purchased, setPurchased] = useState([]);
 const [showLoginModal, setShowLoginModal] = useState(false);
-
+const [isSignupOpen, setIsSignupOpen] = useState(false);
   const navigate = useNavigate();
   const {user}=useAuth();
  useEffect(() => {
@@ -118,9 +119,15 @@ async function share(doc) {
   return (
       <div className="font-poppins px-3 sm:px-8 py-6">
         <LoginModal
-  isOpen={showLoginModal}
-  onClose={() => setShowLoginModal(false)}
-/>
+               isOpen={showLoginModal}
+               onClose={() => setShowLoginModal(false)}
+                onOpenSignup={() => setIsSignupOpen(true)}
+             />
+                <SignupModal
+                     isOpen={isSignupOpen}
+                     onClose={() => setIsSignupOpen(false)}
+                   onOpenLogin={() => setShowLoginModal(true)}
+                   />
     <div className="text-center mb-8 sm:mb-12">
       <h2 className="text-2xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#4f46e5] to-[#22c55e]">
        Buy - Download - Print

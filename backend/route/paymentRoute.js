@@ -62,8 +62,40 @@ router.get("/purchased", middleware, async (req, res) => {
     const payments = await paymentModel
       .find({ userId: req.user.id })
       .select("documentId");
+     
     const purchasedIds = payments.map((p) => p.documentId.toString());
     res.json(purchasedIds);
+  } catch (error) {
+    console.error("Error fetching purchased docs:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.get("/my-document", middleware, async (req, res) => {
+try {
+    // Find all payments for the user and populate the document details
+    const payments = await paymentModel
+      .find({ userId: req.user.id })
+      .populate({
+        path: "documentId",
+        model: "DocumentModel",
+        select: "-__v", // exclude __v field
+      });
+
+    // Map payments to documents
+    const purchasedDocs = payments.map((p) => {
+      const doc = p.documentId.toObject();
+
+      // Convert thumbnail buffer to base64 if exists
+      if (doc.thumbnailImage?.data) {
+        doc.thumbnailBase64 = `data:${doc.thumbnailImage.contentType};base64,${doc.thumbnailImage.data.toString('base64')}`;
+      }
+
+      return doc;
+    });
+
+    
+    res.json(purchasedDocs);
   } catch (error) {
     console.error("Error fetching purchased docs:", error);
     res.status(500).json({ message: "Server error" });

@@ -2,10 +2,11 @@ import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "sonner";
 import { GoogleLogin } from "@react-oauth/google";
-import { Mail, Lock, Loader2 } from "lucide-react"
-export default function LoginModal({ isOpen, onClose, onOpenSignup }) {
-  const { login ,googleLogin} = useAuth();
+import { Mail, Lock, User, Loader2, Check, X } from "lucide-react"
+export default function SignupModal({ isOpen, onClose, onOpenLogin }) {
+  const { signup,googleLogin } = useAuth();
 
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -19,27 +20,27 @@ export default function LoginModal({ isOpen, onClose, onOpenSignup }) {
     setError("");
 
     try {
-      await login(email, password);
-      toast.success("Logged in successfully!");
+      await signup(name, email, password);
+      toast.success("Account created successfully!");
       onClose();
     } catch (err) {
       console.error(err);
-      setError(err?.response?.data?.message || "Login failed");
-      toast.error("Invalid credentials");
+      setError(err?.response?.data?.message || "Signup failed");
+      toast.error(err?.response?.data?.message || "Signup failed");
     } finally {
       setLoading(false);
     }
   }
-  const handleGoogleSuccess = async (credentialResponse) => {
-    const token = credentialResponse.credential;
-    await googleLogin(token);
-     toast.success("Logged in successfully!");
-    onClose();
-  };
+   const handleGoogleSuccess = async (credentialResponse) => {
+      const token = credentialResponse.credential;
+      await googleLogin(token);
+       toast.success("Account created successfully!");
+      onClose();
+    };
 
   return (
-     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl relative animate-in fade-in-50 zoom-in-95 duration-300">
+  <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl relative animate-in fade-in-50 zoom-in-95 duration-300 max-h-[90vh] overflow-y-auto">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors p-1 hover:bg-gray-100 rounded-lg"
@@ -50,11 +51,26 @@ export default function LoginModal({ isOpen, onClose, onOpenSignup }) {
         </button>
 
         <div className="mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome back</h2>
-          <p className="text-gray-500 text-sm">Sign in to your account to continue</p>
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">Create account</h2>
+          <p className="text-gray-500 text-sm">Join us today and get started</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
+            <div className="relative">
+              <User className="absolute left-3 top-3.5 w-5 h-5 text-gray-400" />
+              <input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                type="text"
+                required
+                placeholder="John Doe"
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-gray-50 hover:bg-white"
+              />
+            </div>
+          </div>
+
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
             <div className="relative">
@@ -79,10 +95,51 @@ export default function LoginModal({ isOpen, onClose, onOpenSignup }) {
                 onChange={(e) => setPassword(e.target.value)}
                 type="password"
                 required
+                minLength={6}
                 placeholder="••••••••"
                 className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-gray-50 hover:bg-white"
               />
             </div>
+
+            {password && (
+              <div className="mt-3 space-y-2">
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full ${passwordStrength.color} transition-all duration-300`}
+                      style={{ width: `${(passwordStrength.strength / 4) * 100}%` }}
+                    ></div>
+                  </div>
+                  <span className="text-xs font-medium text-gray-600">{passwordStrength.label}</span>
+                </div>
+                <div className="text-xs text-gray-500 space-y-1">
+                  <div className="flex items-center gap-2">
+                    {password.length >= 8 ? (
+                      <Check className="w-4 h-4 text-green-500" />
+                    ) : (
+                      <X className="w-4 h-4 text-gray-300" />
+                    )}
+                    <span>At least 8 characters</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {/[a-z]/.test(password) && /[A-Z]/.test(password) ? (
+                      <Check className="w-4 h-4 text-green-500" />
+                    ) : (
+                      <X className="w-4 h-4 text-gray-300" />
+                    )}
+                    <span>Mix of uppercase and lowercase</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {/\d/.test(password) ? (
+                      <Check className="w-4 h-4 text-green-500" />
+                    ) : (
+                      <X className="w-4 h-4 text-gray-300" />
+                    )}
+                    <span>At least one number</span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {error && (
@@ -106,10 +163,10 @@ export default function LoginModal({ isOpen, onClose, onOpenSignup }) {
             {loading ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                Signing in...
+                Creating account...
               </>
             ) : (
-              "Sign in"
+              "Create account"
             )}
           </button>
         </form>
@@ -127,8 +184,8 @@ export default function LoginModal({ isOpen, onClose, onOpenSignup }) {
           <GoogleLogin
             onSuccess={handleGoogleSuccess}
             onError={() => {
-              toast.error("Google login failed")
-              console.log("Google login failed")
+              toast.error("Google signup failed")
+              console.log("Google signup failed")
             }}
             theme="outline"
             size="large"
@@ -137,15 +194,15 @@ export default function LoginModal({ isOpen, onClose, onOpenSignup }) {
         </div>
 
         <p className="text-center text-gray-600 text-sm">
-          Don't have an account?{" "}
+          Already have an account?{" "}
           <button
             onClick={() => {
               onClose()
-              onOpenSignup()
+              onOpenLogin()
             }}
             className="text-blue-600 hover:text-blue-700 font-semibold hover:underline transition-colors"
           >
-            Sign up
+            Log in
           </button>
         </p>
       </div>
