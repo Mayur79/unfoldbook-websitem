@@ -3,18 +3,26 @@ import { useAuth } from "../context/AuthContext";
 import { Menu, X } from "lucide-react";
 import LoginModal from "../Pages/Login";
 import { toast } from "sonner";
+import SignupModal from "../Pages/SignupModal";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const { user, logout } = useAuth();
 const [showLoginModal, setShowLoginModal] = useState(false);
+const [isSignupOpen, setIsSignupOpen] = useState(false);
   return (
     <>
    <LoginModal
         isOpen={showLoginModal}
         onClose={() => setShowLoginModal(false)}
+         onOpenSignup={() => setIsSignupOpen(true)}
       />
+         <SignupModal
+              isOpen={isSignupOpen}
+              onClose={() => setIsSignupOpen(false)}
+            onOpenLogin={() => setShowLoginModal(true)}
+            />
     <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm font-poppins">
        
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
@@ -31,16 +39,47 @@ const [showLoginModal, setShowLoginModal] = useState(false);
 
         {/* Desktop Menu */}
         <ul className="hidden md:flex space-x-8 text-sm font-medium">
-          {["Home", "About", "Services", "Contact"].map((item) => (
-            <li key={item}>
+          {/* {["Home", "About", "Services", "Contact"].map((item) => ( */}
+            <li >
+              <a
+                href="/"
+                className="text-gray-700 hover:text-emerald-600 transition-colors duration-200"
+              >
+                Home
+              </a>
+            </li>
+            <li >
               <a
                 href="#"
                 className="text-gray-700 hover:text-emerald-600 transition-colors duration-200"
               >
-                {item}
+                About
               </a>
             </li>
-          ))}
+            <li >
+              <a
+                href="#"
+                className="text-gray-700 hover:text-emerald-600 transition-colors duration-200"
+              >
+                Services
+              </a>
+              
+            </li>
+
+            {user? <>
+             <li >
+              <a
+                href="my-document"
+                className="text-gray-700 hover:text-emerald-600 transition-colors duration-200"
+              >
+               My Document
+              </a>
+              
+            </li>
+            </>:(
+              <></>
+            )  }
+          {/* ))} */}
         </ul>
 
         {/* User + Mobile Menu Button */}
@@ -69,14 +108,22 @@ const [showLoginModal, setShowLoginModal] = useState(false);
                     </p>
                   </div>
                   <ul className="py-1 text-sm text-gray-700">
-                    <li>
+                       {user?.role==='admin' ? 
+                      <>
+                       <li>
                       <a
-                        href="/dashboard"
+                        href="/admin"
                         className="block px-4 py-2 hover:bg-gray-50"
                       >
-                        Dashboard
+                     Admin Dashboard
                       </a>
                     </li>
+                      </> 
+                      :(
+                        <>
+                        </>
+                      )}
+                   
                     <li>
                       <button
                         onClick={logout}
@@ -93,7 +140,7 @@ const [showLoginModal, setShowLoginModal] = useState(false);
             <button
              onClick={()=>{
                  if (!user) {
-    toast.success("You must log in to buy this document."); 
+    // toast.success("You must log in to buy this document."); 
     setShowLoginModal(true);
     return;
   }

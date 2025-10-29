@@ -16,14 +16,25 @@ import AdminDashboard from './Component/AdminDashboard';
 import RolePage from './Component/RolePage';
 import Customer from "./Component/Customer";
 import AllDocument from "./Component/AllDocuments";
+import SignupModal from './Pages/SignupModal';
+import AdminRoute from './services/AdminRoute';
+import MyDocument from './Pages/MyDocument';
 function App() {
 
    const [showLoginModal, setShowLoginModal] = useState(false);
+     const [isSignupOpen, setIsSignupOpen] = useState(false);
   return (
 <>
    <LoginModal
         isOpen={showLoginModal}
         onClose={() => setShowLoginModal(false)}
+      onOpenSignup={() => setIsSignupOpen(true)}
+
+      />
+        <SignupModal
+        isOpen={isSignupOpen}
+        onClose={() => setIsSignupOpen(false)}
+     onOpenLogin={() => setShowLoginModal(true)}
       />
 
 
@@ -48,9 +59,7 @@ function App() {
               <Route path="/" element={<Navigate to="/home" replace />} />
               {/* <Route path="/login" element={<Login />} /> */}
 
-              <Route path="/admin" element={
-                      <PrivateRoute openLoginModal={() => setShowLoginModal(true)}><Admin />
-                   </PrivateRoute>} />
+             
               <Route
                 path="/dashboard"
                 element={
@@ -59,6 +68,15 @@ function App() {
                   </PrivateRoute>
                 }
               />
+              <Route
+                path="/my-document"
+                element={
+                     <PrivateRoute openLoginModal={() => setShowLoginModal(true)}>
+                    <MyDocument />
+                  </PrivateRoute>
+                }
+              />
+
               <Route
                 path="/home"
                 element={
@@ -86,13 +104,21 @@ function App() {
           </Layout>
         }
       />
-        <Route path="/admin" element={<Admin />}>
+        <Route path="/admin" element={
+          
+             <AdminRoute openLoginModal={() => setShowLoginModal(true)}><Admin /></AdminRoute>}>
          <Route index element={<Navigate to="dashboard" replace />} />
-          <Route path="dashboard" element={<AdminDashboard />} />
-          <Route path="roles" element={<RolePage />} />
-          <Route path="customers" element={<Customer />} />
-          <Route path="alldocuments" element={<AllDocument  />} />
-          <Route path="upload-document" element={<UploadDocument  />} />
+          <Route path="dashboard" element={
+            <AdminRoute openLoginModal={() => setShowLoginModal(true)}>
+            <AdminDashboard />
+            </AdminRoute>} />
+          <Route path="roles" element={
+               <AdminRoute openLoginModal={() => setShowLoginModal(true)}><RolePage /></AdminRoute>} />
+          <Route path="customers" element={
+               <AdminRoute openLoginModal={() => setShowLoginModal(true)}><Customer /></AdminRoute>} />
+          <Route path="alldocuments" element={   <AdminRoute openLoginModal={() => setShowLoginModal(true)}><AllDocument  /></AdminRoute>} />
+          <Route path="upload-document" element={
+               <AdminRoute openLoginModal={() => setShowLoginModal(true)}><UploadDocument  /></AdminRoute>} />
          
       
         </Route>
