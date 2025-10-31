@@ -165,16 +165,48 @@ const [isSignupOpen, setIsSignupOpen] = useState(false);
       {isMenuOpen && (
         <div className="md:hidden border-t border-gray-100 bg-white shadow-sm">
           <ul className="flex flex-col p-4 space-y-2">
-            {["Home", "About", "Services", "Contact"].map((item) => (
-              <li key={item}>
+           
+              <li >
                 <a
                   href="#"
                   className="block py-2 px-3 rounded-md text-gray-700 hover:bg-gray-100 hover:text-emerald-600 transition"
                 >
-                  {item}
+                Home
                 </a>
               </li>
-            ))}
+            
+              <li >
+                <a
+                  href="#"
+                  className="block py-2 px-3 rounded-md text-gray-700 hover:bg-gray-100 hover:text-emerald-600 transition"
+                >
+                About
+                </a>
+              </li>
+              <li >
+                <a
+                  href="#"
+  className="block py-2 px-3 rounded-md text-gray-700 hover:bg-gray-100 hover:text-emerald-600 transition"
+                >
+                Services
+                </a>
+              </li>
+                 {user? <>
+             <li >
+              <a
+                href="my-document"
+            className="block py-2 px-3 rounded-md text-gray-700 hover:bg-gray-100 hover:text-emerald-600 transition"
+              >
+               My Document
+              </a>
+              
+            </li>
+            </>:(
+              <></>
+            )  }
+          {/* ))} */}
+      
+            
           </ul>
         </div>
       )}
