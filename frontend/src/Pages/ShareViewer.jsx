@@ -7,6 +7,7 @@ import { zoomPlugin } from '@react-pdf-viewer/zoom';
 import { pageNavigationPlugin } from '@react-pdf-viewer/page-navigation';
 import api from "../services/api";
 import { Printer } from 'lucide-react';
+import { toast } from "sonner";
 export default function ShareViewer() {
   const { token } = useParams();
   const [pdfUrl, setPdfUrl] = useState(null);
@@ -38,7 +39,7 @@ export default function ShareViewer() {
         setPrintBlobUrl(blobUrl);
     } catch (err) {
       console.error("Error loading shared document:", err);
-      alert("Invalid or expired share link.");
+      toast.error("Invalid or expired share link.");
     }
   }
   const handlePrint = () => {

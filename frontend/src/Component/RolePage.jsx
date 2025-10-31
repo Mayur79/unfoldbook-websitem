@@ -1,18 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { Filter, Info, ChevronDown } from "lucide-react";
-
-const templatePeople = [
-  { handle: "@alicesmith", method: "VISA •••• 18", categories: ["Arts", "Business", "Travel"], pct: 0.8 },
-  { handle: "@bobjohnson", method: "MC •••• 99", categories: ["Books", "Computers"], pct: 0.35 },
-  { handle: "@claragarcia", method: "MC •••• 14", categories: ["Kitchen", "Books"], pct: 0.98 },
-  { handle: "@emmalee", method: "MC •••• 19", categories: ["Furniture"], pct: 0.45 },
-  { handle: "@gracetaylor", method: "VISA •••• 50", categories: ["Beauty", "Apparel"], pct: 0.65 },
-   { handle: "@gracetaylor", method: "VISA •••• 50", categories: ["Beauty", "Apparel"], pct: 0.65 },
-    { handle: "@gracetaylor", method: "VISA •••• 50", categories: ["Beauty", "Apparel"], pct: 0.65 },
-];
-
+import { Filter, ChevronDown } from "lucide-react";
+import axios from "axios";
+import api from "../services/api";
+import {toast} from "sonner"
 function Avatar({ name }) {
-  const initials = name.split(" ").map((n) => n[0]).slice(0, 2).join("");
+  const initials = name
+    ? name
+        .split(" ")
+        .map((n) => n[0])
+        .slice(0, 2)
+        .join("")
+    : "?";
   return (
     <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-emerald-500 to-emerald-300 text-white flex items-center justify-center text-sm font-semibold shadow-sm">
       {initials}
@@ -23,29 +21,58 @@ function Avatar({ name }) {
 export default function RolePage() {
   const [people, setPeople] = useState([]);
   const [roles, setRoles] = useState({});
+  const [loading, setLoading] = useState(true);
 
+  // Fetch all users
   useEffect(() => {
-    fetch("http://localhost:4000/api/users")
-      .then(res => res.json())
-      .then(userList => {
-        // Assign MongoDB names to template objects
-        const rendered =
-          userList.length > 0
-            ? userList.slice(0, templatePeople.length).map((user, i) => ({
-                ...templatePeople[i],
-                name: user.name,
-              }))
-            : [];
-        setPeople(rendered);
-        setRoles(Object.fromEntries(rendered.map((u) => [u.name, u.role || "User"])));
-      });
+    const fetchUsers = async () => {
+      try {
+        const res = await api.get("/api/users");
+        const userList = res.data;
+
+        setPeople(userList);
+        // Initialize roles state with existing user roles
+        const roleMap = {};
+        userList.forEach((u) => {
+          roleMap[u._id] = u.role || "User";
+        });
+        setRoles(roleMap);
+      } catch (err) {
+        console.error("Error fetching users:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
   }, []);
 
-  const handleRoleChange = (name, newRole) => {
-    setRoles(prev => ({ ...prev, [name]: newRole }));
+  // Handle role change
+  const handleRoleChange = async (userId, newRole) => {
+    try {
+      // Update immediately in UI
+      setRoles((prev) => ({ ...prev, [userId]: newRole }));
+
+      // Send update to backend
+      await api.put(`/api/users/update-role/${userId}/role`, {
+        role: newRole,
+      });
+
+  
+      toast.success("Role updated successfully");
+    } catch (err) {
+      toast.error("Error updating the role")
+      console.error("Error updating role:", err);
+    }
   };
 
-  const roleOptions = ["User", "Secure Admin", "Admin"];
+  const roleOptions = ["user", "admin"];
+
+  if (loading) {
+    return (
+      <div className="text-center py-10 text-gray-500">Loading users...</div>
+    );
+  }
 
   return (
     <div className="bg-white/70 backdrop-blur-md border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow duration-300">
@@ -69,10 +96,7 @@ export default function RolePage() {
           <thead>
             <tr className="text-left text-sm text-gray-500 uppercase tracking-wide">
               <th className="py-2 px-4">Customer</th>
-            
-              
               <th className="py-2 px-4">Role</th>
-            
             </tr>
           </thead>
 
@@ -82,28 +106,25 @@ export default function RolePage() {
                 key={idx}
                 className="bg-white hover:bg-gray-50 transition-all duration-200 shadow-sm rounded-xl"
               >
-                {/* Customer */}
+                {/* Customer Info */}
                 <td className="py-4 px-4 rounded-l-xl">
                   <div className="flex items-center gap-3">
                     <Avatar name={p.name} />
                     <div>
                       <div className="font-medium text-gray-900">{p.name}</div>
-                      <div className="text-xs text-gray-400">{p.handle}</div>
+                      <div className="text-xs text-gray-400">{p.email}</div>
                     </div>
                   </div>
                 </td>
-
-               
-
-                
-                
 
                 {/* Role Dropdown */}
                 <td className="py-4 px-4">
                   <div className="relative inline-block text-left w-36">
                     <select
-                      value={roles[p.name]}
-                      onChange={(e) => handleRoleChange(p.name, e.target.value)}
+                      value={roles[p._id] || "User"}
+                      onChange={(e) =>
+                        handleRoleChange(p._id, e.target.value)
+                      }
                       className="w-full appearance-none text-xs font-medium bg-gray-50 border border-gray-200 text-gray-700 rounded-lg px-3 py-2 pr-6 cursor-pointer hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition"
                     >
                       {roleOptions.map((role) => (
@@ -118,8 +139,6 @@ export default function RolePage() {
                     />
                   </div>
                 </td>
-
-                
               </tr>
             ))}
           </tbody>

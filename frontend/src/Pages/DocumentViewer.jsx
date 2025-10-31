@@ -9,11 +9,11 @@ import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/zoom/lib/styles/index.css';
 import '@react-pdf-viewer/page-navigation/lib/styles/index.css';
 import { Printer } from 'lucide-react';
-
+import { toast } from 'sonner';
 export default function DocumentViewer() {
   const { docId } = useParams();
   const [pdfUrl, setPdfUrl] = useState(null);
-
+const [numPages, setNumPages] = useState(0);
 const [printBlobUrl, setPrintBlobUrl] = useState(null);
 
   const iframeRef = useRef(null);
@@ -46,7 +46,7 @@ const response = await fetch(presignedUrl);
       setPrintBlobUrl(blobUrl);
   } catch (err) {
     console.error('Error loading PDF:', err);
-    alert('Failed to load document');
+    toast.error('Failed to load document');
   }
 }
 
@@ -83,6 +83,7 @@ const response = await fetch(presignedUrl);
   fileUrl={pdfUrl}
   plugins={[zoomPluginInstance, pageNavigationPluginInstance]}
 defaultScale={SpecialZoomLevel.PageFit}
+onDocumentLoad={(e) => setNumPages(e.doc.numPages)}
 />
             </div>
           </Worker>
@@ -101,7 +102,12 @@ defaultScale={SpecialZoomLevel.PageFit}
       />
 
      {/* page no and zoom ka code */}
- <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
+ <div
+  className={`fixed left-1/2 transform -translate-x-1/2 z-50 transition-all
+    ${numPages === 1 ? 'bottom-60 md:bottom-6' : 'bottom-6'}
+  `}
+>
+
         <div className="flex items-center md:gap-2 bg-white border border-gray-200 rounded-full shadow-lg px-3 md:px-5 py-2 backdrop-blur-sm bg-opacity-95">
     
           <div className="flex items-center gap-2">

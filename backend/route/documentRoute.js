@@ -119,8 +119,7 @@ router.post("/saveMetadata", middleware, upload.single("thumbnail"), async (req,
 
 router.get("/", async (req, res) => {
   try {
-    const docs = await documentModel.find();
-
+   const docs = await documentModel.find().populate('category', 'categoryName');
    
     const docsWithThumbnails = docs.map((doc) => {
       const docObj = doc.toObject();

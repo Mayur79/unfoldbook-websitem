@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import api from "../services/api";
-
+import { toast } from "sonner";
 const UploadDocument = () => {
   const [file, setFile] = useState(null);
   const [thumbnail, setThumbnail] = useState(null);
@@ -37,7 +37,7 @@ const UploadDocument = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!file || !thumbnail) {
-      alert("Both document and thumbnail are required");
+      toast.warning("Both document and thumbnail are required");
       return;
     }
     setIsUploading(true);
@@ -64,7 +64,7 @@ const UploadDocument = () => {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      alert("Upload successful!");
+      toast.success("Upload successful!");
       setTitle("");
       setDescription("");
       setPrice("");
@@ -74,7 +74,7 @@ const UploadDocument = () => {
       setSelectedCategory("");
     } catch (error) {
       console.error("Upload error:", error);
-      alert("Upload failed. Please try again.");
+      toast.error("Upload failed. Please try again.");
     } finally {
       setIsUploading(false);
     }
@@ -170,7 +170,7 @@ const UploadDocument = () => {
                   const droppedFile = e.dataTransfer.files[0];
                   if (droppedFile.type === "application/pdf") {
                     setFile(droppedFile);
-                  } else alert("Please drop a PDF file");
+                  } else toast.warning("Please drop a PDF file");
                 }
               }}
               className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${

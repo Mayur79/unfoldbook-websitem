@@ -32,7 +32,7 @@ const [modalOpen, setModalOpen] = useState(false);
       toast.success("Categories delete successfully")
     } catch (err) {
       console.error(err);
-      alert("Failed to delete category");
+      toast.error("Failed to delete category");
     }
   };
   useEffect(() => {

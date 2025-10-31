@@ -5,7 +5,7 @@ import pdfimage from '../assets/pdfimage.png';
 import LoginModal from './Login';
 import SignupModal from './SignupModal';
 import { useNavigate } from 'react-router-dom';
-
+import { toast } from 'sonner';
 const MyDocument = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -44,11 +44,11 @@ const MyDocument = () => {
         });
       } else {
         await navigator.clipboard.writeText(shareUrl);
-        alert('Share link copied to clipboard!');
+        toast.success('Share link copied to clipboard!');
       }
     } catch (err) {
       console.error('Error generating share link:', err);
-      alert('Failed to generate share link.');
+      // alert('Failed to generate share link.');
     }
   }
 

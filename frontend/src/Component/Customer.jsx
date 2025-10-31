@@ -1,6 +1,7 @@
 // src/Pages/Customer.jsx
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Filter } from "lucide-react";
+import api from "../services/api";
 
 // Avatar component (same style as RolePage)
 function Avatar({ name }) {
@@ -17,32 +18,30 @@ function Avatar({ name }) {
 }
 
 export default function Customer() {
-  const customers = [
-    {
-      name: "John Doe",
-      email: "john.doe@gmail.com",
-      password: "••••••••",
-      documents: 5,
-    },
-    {
-      name: "Jane Smith",
-      email: "jane.smith@gmail.com",
-      password: "••••••••",
-      documents: 3,
-    },
-    {
-      name: "David Chen",
-      email: "david.chen@gmail.com",
-      password: "••••••••",
-      documents: 8,
-    },
-    {
-      name: "Sophia Patel",
-      email: "sophia.patel@gmail.com",
-      password: "••••••••",
-      documents: 6,
-    },
-  ];
+   const [customers, setCustomers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      try {
+        const res = await api.get("/api/users/user-doc-data");
+        setCustomers(res.data);
+      } catch (error) {
+        console.error("Error fetching customers:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCustomers();
+  }, []);
+
+
+  if (loading) {
+    return (
+      <div className="text-center py-10 text-gray-500">Loading customers...</div>
+    );
+  }
+
 
   return (
     <div className="bg-white/70 backdrop-blur-md border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow duration-300">
@@ -85,7 +84,7 @@ export default function Customer() {
                     <div>
                       <div className="font-medium text-gray-900">{c.name}</div>
                       <div className="text-xs text-gray-400">
-                        Joined 2025 • Active
+                     Joined {new Date(c.createdAt).toLocaleDateString()} • Active
                       </div>
                     </div>
                   </div>
@@ -95,12 +94,12 @@ export default function Customer() {
                 <td className="py-4 px-4 text-gray-700">{c.email}</td>
 
                 {/* Password */}
-                <td className="py-4 px-4 text-gray-700">{c.password}</td>
+                <td className="py-4 px-4 text-gray-700">{c.password|| "*****"}</td>
 
                 {/* Documents */}
                 <td className="py-4 px-4 rounded-r-xl">
                   <span className="px-3 py-1 text-xs font-medium bg-emerald-50 text-emerald-700 rounded-full">
-                    {c.documents} Docs
+                     {c.documents} Docs
                   </span>
                 </td>
               </tr>
