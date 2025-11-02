@@ -21,6 +21,9 @@ export default function Documents() {
   const navigate = useNavigate();
   const [current, setCurrent] = useState(0);
   const { user } = useAuth();
+  // Generate random rating between 3.5 and 5.0 (1 decimal)
+const getRandomRating = () => (Math.random() * (5 - 4) + 4).toFixed(1);
+const getRandomCount = () => Math.floor(Math.random() * 200) + 20; // between 20–220
   const banners = [banner1, banner2, banner3, banner4];
 
 const [selectedCategory, setSelectedCategory] = useState("All");
@@ -34,10 +37,16 @@ const [selectedCategory, setSelectedCategory] = useState("All");
   }, [user]);
 
   
-  async function loadDocs() {
-    const res = await api.get('/api/v1/doc');
-    setDocs(res.data);
-  }
+ async function loadDocs() {
+  const res = await api.get("/api/v1/doc");
+  const docsWithRatings = res.data.map((doc) => ({
+    ...doc,
+    rating: getRandomRating(),
+    ratingCount: getRandomCount(),
+  }));
+  setDocs(docsWithRatings);
+}
+
 const [categories, setCategories] = useState([]);
   useEffect(() => {
     const interval = setInterval(() => {
@@ -210,7 +219,7 @@ const selectedCategoryName =
           <img
             src={banners[current]}
             alt={`Banner ${current + 1}`}
-            className="w-full h-60 sm:h-64 md:h-96 object-cover  shadow-md"
+            className="w-full h-52 sm:h-64 md:h-96 object-cover  shadow-md"
           />
         </motion.div>
         <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
@@ -228,8 +237,8 @@ const selectedCategoryName =
         <h2 className="text-2xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#4f46e5] to-[#22c55e]">
           Buy - Download - Print
         </h2>
-        <p className="text-[#64748b] mt-2 text-xs sm:text-sm">
-          Anytime, Anywhere, <span className='font-bold'>Get 100% Success</span>. All the Best!
+        <p className="text-[#64748b] mt-2 ">
+          Anytime, Anywhere, <span className='font-bold'>Get 100% Success</span>.
         </p>
       </div>
 
@@ -328,17 +337,19 @@ const selectedCategoryName =
           </p>
         </div>
 
-        <div className="flex items-center text-yellow-400 mt-1">
-          {[...Array(filledStars)].map((_, i) => (
-            // <span key={i} className='text-xl'>★</span>
-            <Star key={i} fill='#FDBC00' height={18}/>
-          ))}
-          {/* {halfStar && <span>☆</span> */}
-         {/* {halfStar && <StarRating fill="#FDBC00" height={18} stroke="#FDBC00" />} */}
-          <span className="ml-1 text-[#000]">
-            ({ratingData.count})
-          </span>
-        </div>
+      <div className="flex items-center text-yellow-400 mt-1">
+  {Array.from({ length: 5 }).map((_, i) => {
+    if (i < Math.floor(doc.rating))
+      return <Star key={i} fill="#FDBC00" stroke="#FDBC00" height={18} />;
+    if (i === Math.floor(doc.rating) && doc.rating % 1 >= 0.5)
+      return <StarHalf key={i} fill="#FDBC00" stroke="#FDBC00" height={18} />;
+    return <Star key={i} stroke="#FDBC00" height={18} />;
+  })}
+  <span className="ml-1 text-sm text-black font-medium">
+    ({doc.ratingCount})
+  </span>
+</div>
+
       </div>
     </div>
         ))}

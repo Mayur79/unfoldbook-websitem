@@ -97,11 +97,11 @@ const Navbar = () => {
 
             {/* User Menu / Login */}
             {user ? (
-              <div className="md:relative hidden">
+              <div className="">
                 <button
                   type="button"
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                  className="flex items-center justify-center w-9 h-9 rounded-full bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition"
+                  className="hidden md:flex items-center justify-center w-9 h-9 rounded-full bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition"
                 >
                   {user?.name?.charAt(0).toUpperCase() ||
                     user?.email?.charAt(0).toUpperCase() ||
@@ -164,6 +164,19 @@ const Navbar = () => {
         {isMenuOpen && (
           <div className="md:hidden border-t border-gray-100 bg-white shadow-sm">
             <ul className="flex flex-col p-4 space-y-2">
+              {
+                user?null:(
+   <li>
+                <button
+                onClick={() => setShowLoginModal(true)}
+                  className="block py-2 px-3 rounded-md text-gray-700 hover:bg-gray-100 hover:text-emerald-600 transition"
+                >
+                 Login
+                </button>
+              </li>
+                )
+              }
+            
               <li>
                 <a
                   href="/"
@@ -188,6 +201,7 @@ const Navbar = () => {
                   Services
                 </a>
               </li>
+             
               {user && (
                 <li>
                   <a
