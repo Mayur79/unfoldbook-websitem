@@ -26,7 +26,7 @@ export default function Documents() {
 const [selectedCategory, setSelectedCategory] = useState("All");
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 4;
+  const itemsPerPage = 6;
 
   useEffect(() => {
     loadDocs();
@@ -347,7 +347,7 @@ const selectedCategoryName =
       {/* Pagination Controls */}
      {/* Modern Pagination Controls */}
 {totalPages > 1 && (
-  <div className="flex justify-center items-center mt-10 space-x-2 sm:space-x-3">
+  <div className="flex justify-center items-center mt-10 space-x-2 sm:space-x-3 mb-4">
     {/* Prev Button */}
     <button
       onClick={() => handlePageChange(currentPage - 1)}
@@ -385,6 +385,30 @@ const selectedCategoryName =
     </button>
   </div>
 )}
+ <div className="relative w-full overflow-hidden mb-10">
+        <motion.div
+          key={current}
+          initial={{ opacity: 0, x: 50 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -50 }}
+          transition={{ duration: 0.6 }}
+        >
+          <img
+            src={banners[current]}
+            alt={`Banner ${current + 1}`}
+            className="w-full h-60 sm:h-64 md:h-96 object-cover  shadow-md"
+          />
+        </motion.div>
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
+          {banners.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrent(i)}
+              className={`w-2.5 h-2.5 rounded-full transition-all ${current === i ? 'bg-white' : 'bg-gray-400'}`}
+            />
+          ))}
+        </div>
+      </div>
  
     </div>
   );
