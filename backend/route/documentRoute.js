@@ -60,7 +60,7 @@ router.post("/presign", middleware, async (req, res) => {
 
 router.post("/saveMetadata", middleware, upload.single("thumbnail"), async (req, res) => {
   try {
-    const { title, price, type, category, fileKey, description } = req.body;
+    const { title, originalPrice,discountPercent,finalPrice, type, category, fileKey, description ,} = req.body;
     const thumbnail = req.file;
 
     if (!fileKey) {
@@ -69,7 +69,9 @@ router.post("/saveMetadata", middleware, upload.single("thumbnail"), async (req,
 
     const newDoc = new documentModel({
       title,
-      price,
+      price:originalPrice,
+      finalPrice,
+      discountPercent,
       type,
       description,
       category,

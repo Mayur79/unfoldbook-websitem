@@ -9,11 +9,24 @@ const UploadDocument = () => {
   const [preview, setPreview] = useState(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [price, setPrice] = useState("");
+  
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [isUploading, setIsUploading] = useState(false);
+const [originalPrice, setOriginalPrice] = useState("");
+const [discountPercent, setDiscountPercent] = useState("");
+const [finalPrice, setFinalPrice] = useState("");
 
+
+useEffect(() => {
+  if (originalPrice && discountPercent) {
+    const discount = (Number(originalPrice) * Number(discountPercent)) / 100;
+    const final = Number(originalPrice) - discount;
+    setFinalPrice(final.toFixed(2));
+  } else {
+    setFinalPrice(originalPrice || "");
+  }
+}, [originalPrice, discountPercent]);
   useEffect(() => {
     async function fetchCategories() {
       try {
@@ -55,7 +68,10 @@ const UploadDocument = () => {
       const formData = new FormData();
       formData.append("title", title);
       formData.append("description", description);
-      formData.append("price", price);
+     formData.append("originalPrice", originalPrice);
+formData.append("discountPercent", discountPercent);
+formData.append("finalPrice", finalPrice);
+
       formData.append("category", selectedCategory);
       formData.append("fileKey", data.fileKey);
       formData.append("thumbnail", thumbnail);
@@ -67,7 +83,9 @@ const UploadDocument = () => {
       toast.success("Upload successful!");
       setTitle("");
       setDescription("");
-      setPrice("");
+      setOriginalPrice("");
+      setFinalPrice("");
+      setDiscountPercent("");
       setFile(null);
       setThumbnail(null);
       setPreview(null);
@@ -207,39 +225,71 @@ const UploadDocument = () => {
             </div>
 
             {/* Price and Category */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  Price
-                </label>
-                <input
-                  type="number"
-                  placeholder="0.00"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                  required
-                  className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  Category
-                </label>
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  required
-                  className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition bg-white"
-                >
-                  <option value="">Select category</option>
-                  {categories.map((cat) => (
-                    <option key={cat._id} value={cat._id}>
-                      {cat.categoryName}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
+         {/* Price and Category Section */}
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+  {/* Original Price */}
+  <div>
+    <label className="block text-sm font-semibold text-gray-700 mb-1">
+      Original Price
+    </label>
+    <input
+      type="number"
+      placeholder="Enter original price"
+      value={originalPrice}
+      onChange={(e) => setOriginalPrice(e.target.value)}
+      required
+      className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition"
+    />
+  </div>
+
+  {/* Discount (%) */}
+  <div>
+    <label className="block text-sm font-semibold text-gray-700 mb-1">
+      Discount (%)
+    </label>
+    <input
+      type="number"
+      placeholder="Enter discount percentage"
+      value={discountPercent}
+      onChange={(e) => setDiscountPercent(e.target.value)}
+      className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition"
+    />
+  </div>
+
+  {/* Final Price (auto-calculated) */}
+  <div>
+    <label className="block text-sm font-semibold text-gray-700 mb-1">
+      Final Price
+    </label>
+    <input
+      type="text"
+      value={finalPrice}
+      readOnly
+      className="w-full bg-gray-100 border-2 border-gray-200 rounded-xl px-4 py-3 outline-none text-gray-700 font-semibold"
+    />
+  </div>
+
+  {/* Category */}
+  <div>
+    <label className="block text-sm font-semibold text-gray-700 mb-1">
+      Category
+    </label>
+    <select
+      value={selectedCategory}
+      onChange={(e) => setSelectedCategory(e.target.value)}
+      required
+      className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition bg-white"
+    >
+      <option value="">Select category</option>
+      {categories.map((cat) => (
+        <option key={cat._id} value={cat._id}>
+          {cat.categoryName}
+        </option>
+      ))}
+    </select>
+  </div>
+</div>
+
 
             {/* Submit Button */}
             <button

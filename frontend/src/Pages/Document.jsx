@@ -11,7 +11,8 @@ import banner2 from "../assets/banner2.jpg";
 import banner3 from "../assets/banner3.jpg";
 import banner4 from "../assets/banner4.jpg";
 import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import { ChevronLeft, ChevronRight, Eye, Heart, ShoppingCart, Star, StarHalf } from "lucide-react"
+import StarRating from '../Component/StarRating';
 export default function Documents() {
   const [docs, setDocs] = useState([]);
   const [purchased, setPurchased] = useState([]);
@@ -164,8 +165,28 @@ const selectedCategoryName =
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+   const ratingOptions = [
+    { rating: 4.8, count: 95 },
+    { rating: 4.6, count: 72 },
+    { rating: 4.9, count: 134 },
+    { rating: 4.7, count: 88 },
+    { rating: 5.0, count: 150 },
+  ];
+
+  const [ratingData, setRatingData] = useState({ rating: 0, count: 0 });
+
+  useEffect(() => {
+    // Pick one rating randomly from hardcoded list
+    const random = ratingOptions[Math.floor(Math.random() * ratingOptions.length)];
+    setRatingData(random);
+  }, []);
+
+  const filledStars = Math.floor(ratingData.rating);
+  const halfStar = ratingData.rating - filledStars >= 0.5;
+
+
   return (
-    <div className="font-poppins px-3 sm:px-8 py-6">
+    <div className="font-poppins ">
       <LoginModal
         isOpen={showLoginModal}
         onClose={() => setShowLoginModal(false)}
@@ -178,7 +199,7 @@ const selectedCategoryName =
       />
 
       {/* Banner carousel */}
-      <div className="relative w-full overflow-hidden rounded-xl mb-10">
+      <div className="relative w-full overflow-hidden mb-10">
         <motion.div
           key={current}
           initial={{ opacity: 0, x: 50 }}
@@ -189,7 +210,7 @@ const selectedCategoryName =
           <img
             src={banners[current]}
             alt={`Banner ${current + 1}`}
-            className="w-full h-48 sm:h-64 md:h-96 object-cover rounded-xl shadow-md"
+            className="w-full h-60 sm:h-64 md:h-96 object-cover  shadow-md"
           />
         </motion.div>
         <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
@@ -250,57 +271,76 @@ const selectedCategoryName =
 </h2>
 
       {/* Documents Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6 lg:gap-8 justify-center mt-2">
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-6 lg:gap-8 justify-center mt-2 mx-4 md:mx-20 mb-4">
         {currentDocs.map((doc) => (
-          <div
-            key={doc._id}
-            className="group flex flex-col bg-white rounded-xl sm:rounded-2xl shadow-md border border-[#e2e8f0] hover:shadow-lg hover:-translate-y-1 transition-all duration-300 overflow-hidden"
-          >
-            <div className="relative h-36 sm:h-48 bg-[#f1f5f9]">
-              <img
-                src={doc.thumbnailBase64 || pdfimage}
-                alt={doc.title}
-                className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
-              />
-              <span className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-blue-600 text-white text-[10px] sm:text-xs font-semibold px-2 py-1 rounded-full shadow-md">
-                ₹{doc.price}
-              </span>
-            </div>
-            <div className="flex flex-col flex-grow p-3 sm:p-5">
-              <h3 className="text-sm sm:text-lg font-semibold text-[#0f172a] mb-1 sm:mb-2 line-clamp-1">
-                {doc.title}
-              </h3>
-              <p className="text-xs sm:text-sm text-[#475569] mb-4 sm:mb-5 line-clamp-3">
-                {doc.description ||
-                  "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."}
-              </p>
-              <div className="mt-auto">
-                {purchased.includes(doc._id) ? (
-                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-                    <button
-                      onClick={() => view(doc)}
-                      className="w-full text-xs sm:text-sm text-white bg-gradient-to-r from-cyan-500 to-blue-500 font-medium rounded-md sm:rounded-lg px-3 py-1.5 sm:px-5 sm:py-2"
-                    >
-                      Download
-                    </button>
-                    <button
-                      onClick={() => share(doc)}
-                      className="w-full text-xs sm:text-sm text-white bg-gradient-to-br from-green-400 to-blue-600 font-medium rounded-md sm:rounded-lg px-3 py-1.5 sm:px-5 sm:py-2"
-                    >
-                      Share
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => buy(doc)}
-                    className="w-full text-xs sm:text-sm bg-gradient-to-r from-blue-600 to-[#22c55e] hover:from-[#4f46e5] hover:to-[#16a34a] text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-md sm:rounded-lg transition font-semibold"
-                  >
-                    Buy Now
-                  </button>
-                )}
-              </div>
-            </div>
+           <div
+      key={doc._id}
+      className="group relative bg-white  overflow-hidden transition-all duration-300"
+    >
+      {/* Top Section (Image + Discount Badge) */}
+      <div className="relative w-full h-48 flex items-center justify-center overflow-hidden">
+        <img
+          src={doc.thumbnailBase64 || pdfimage}
+          alt={doc.title}
+          className="h-full w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+        />
+        {doc.discountPercent > 0 && (
+          <div className="absolute top-2 right-2 bg-[#1206f1] text-white text-xs font-bold px-2 py-1 rounded-sm">
+            -{doc.discountPercent}%
           </div>
+        )}
+      </div>
+
+      {/* Middle Section (Icons) */}
+      <div className="flex justify-center gap-3 border-b border-gray-100 ">
+        <button
+          onClick={() => view(doc)}
+          className="w-9 h-9 flex items-center justify-center bg-gray-100 hover:bg-blue-100 rounded-full text-gray-600 hover:text-blue-600 transition"
+        >
+          <Eye size={16} />
+        </button>
+        <button
+          onClick={() => buy(doc)}
+          className="w-9 h-9 flex items-center justify-center bg-gray-100 hover:bg-green-100 rounded-full text-gray-600 hover:text-green-600 transition"
+        >
+          <ShoppingCart size={16} />
+        </button>
+        <button
+          onClick={() => share(doc)}
+          className="w-9 h-9 flex items-center justify-center bg-gray-100 hover:bg-pink-100 rounded-full text-gray-600 hover:text-pink-600 transition"
+        >
+          <Heart size={16} />
+        </button>
+      </div>
+
+      {/* Bottom Section (Title + Prices + Rating) */}
+      <div className="px-4 py-3 bg-[#F1F7FA] mt-2 rounded-md">
+        <h3 className="text-sm sm:text-base font-medium text-[#312427] leading-tight line-clamp-2 mb-1">
+          {doc.title}
+        </h3>
+
+        <div className="flex flex-col md:flex-row items-baseline md:gap-2 md:mb-1 mt-2">
+          <p className="text-[#696969] text-sm line-through">
+            ₹{Number(doc.price).toLocaleString()}
+          </p>
+          <p className="text-[#1206f1] font-medium text-base">
+            ₹{Number(doc.finalPrice).toLocaleString()}
+          </p>
+        </div>
+
+        <div className="flex items-center text-yellow-400 mt-1">
+          {[...Array(filledStars)].map((_, i) => (
+            // <span key={i} className='text-xl'>★</span>
+            <Star key={i} fill='#FDBC00' height={18}/>
+          ))}
+          {/* {halfStar && <span>☆</span> */}
+         {/* {halfStar && <StarRating fill="#FDBC00" height={18} stroke="#FDBC00" />} */}
+          <span className="ml-1 text-[#000]">
+            ({ratingData.count})
+          </span>
+        </div>
+      </div>
+    </div>
         ))}
       </div>
 
@@ -345,31 +385,7 @@ const selectedCategoryName =
     </button>
   </div>
 )}
-  <div className="relative w-full overflow-hidden rounded-xl mb-10 mt-10">
-        <motion.div
-          key={current}
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -50 }}
-          transition={{ duration: 0.6 }}
-        >
-          <img
-            src={banners[current]}
-            alt={`Banner ${current + 1}`}
-            className="w-full h-48 sm:h-64 md:h-96 object-cover rounded-xl shadow-md"
-          />
-        </motion.div>
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
-          {banners.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrent(i)}
-              className={`w-2.5 h-2.5 rounded-full transition-all ${current === i ? 'bg-white' : 'bg-gray-400'}`}
-            />
-          ))}
-        </div>
-      </div>
-
+ 
     </div>
   );
 }

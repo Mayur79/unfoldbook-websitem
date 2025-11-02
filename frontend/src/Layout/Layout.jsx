@@ -4,6 +4,7 @@ import Footer from "../Component/Footer";
 import Navbar from "../Component/Navbar";
 import Admin from "../Component/Admin";
 import { Toaster } from "sonner";
+import BottomNavBar from "../Component/BottomNavbar";
 
 export default function Layout({ children }) {
   return (
@@ -12,6 +13,8 @@ export default function Layout({ children }) {
       <Navbar />
       
       <main className="flex-grow ">{children}</main>
+         <BottomNavBar />
+
       <Footer />
     </div>
   );

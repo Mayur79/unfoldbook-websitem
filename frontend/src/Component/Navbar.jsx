@@ -1,46 +1,40 @@
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Search, ShoppingCart } from "lucide-react";
 import LoginModal from "../Pages/Login";
-import { toast } from "sonner";
 import SignupModal from "../Pages/SignupModal";
-
+import logo from "../assets/logo.png";
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const { user, logout } = useAuth();
-const [showLoginModal, setShowLoginModal] = useState(false);
-const [isSignupOpen, setIsSignupOpen] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [isSignupOpen, setIsSignupOpen] = useState(false);
+
   return (
     <>
-   <LoginModal
+      <LoginModal
         isOpen={showLoginModal}
         onClose={() => setShowLoginModal(false)}
-         onOpenSignup={() => setIsSignupOpen(true)}
+        onOpenSignup={() => setIsSignupOpen(true)}
       />
-         <SignupModal
-              isOpen={isSignupOpen}
-              onClose={() => setIsSignupOpen(false)}
-            onOpenLogin={() => setShowLoginModal(true)}
-            />
-    <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm font-poppins">
-       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
-        
-        {/* Logo */}
-        <a href="/" className="flex items-center gap-2">
-          <img
-            src="https://flowbite.com/docs/images/logo.svg"
-            className="h-8"
-            alt="DocBuy Logo"
-          />
-          <span className="text-xl font-semibold text-gray-800">UnfoldBook</span>
-        </a>
+      <SignupModal
+        isOpen={isSignupOpen}
+        onClose={() => setIsSignupOpen(false)}
+        onOpenLogin={() => setShowLoginModal(true)}
+      />
 
-        {/* Desktop Menu */}
-        <ul className="hidden md:flex space-x-8 text-sm font-medium">
-          {/* {["Home", "About", "Services", "Contact"].map((item) => ( */}
-            <li >
+      <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm font-poppins">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
+          {/* Logo */}
+          <a href="/" className="flex items-center gap-2 border-0">
+         
+            <img src={logo} alt=""  className="h-8" />
+          </a>
+
+          {/* Desktop Menu */}
+          <ul className="hidden md:flex space-x-8 text-sm font-medium">
+            <li>
               <a
                 href="/"
                 className="text-gray-700 hover:text-emerald-600 transition-colors duration-200"
@@ -48,7 +42,7 @@ const [isSignupOpen, setIsSignupOpen] = useState(false);
                 Home
               </a>
             </li>
-            <li >
+            <li>
               <a
                 href="#"
                 className="text-gray-700 hover:text-emerald-600 transition-colors duration-200"
@@ -56,161 +50,158 @@ const [isSignupOpen, setIsSignupOpen] = useState(false);
                 About
               </a>
             </li>
-            <li >
+            <li>
               <a
                 href="#"
                 className="text-gray-700 hover:text-emerald-600 transition-colors duration-200"
               >
                 Services
               </a>
-              
             </li>
 
-            {user? <>
-             <li >
-              <a
-                href="my-document"
-                className="text-gray-700 hover:text-emerald-600 transition-colors duration-200"
-              >
-               My Document
-              </a>
-              
-            </li>
-            </>:(
-              <></>
-            )  }
-          {/* ))} */}
-        </ul>
-
-        {/* User + Mobile Menu Button */}
-        <div className="flex items-center gap-4">
-          {user ? (
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                className="flex items-center justify-center w-9 h-9 rounded-full bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition"
-              >
-                {user?.name?.charAt(0).toUpperCase() ||
-                  user?.email?.charAt(0).toUpperCase() ||
-                  "U"}
-              </button>
-
-              {/* Dropdown */}
-              {isUserMenuOpen && (
-                <div className="absolute right-0 mt-3 w-48 rounded-lg bg-white shadow-lg border border-gray-100 overflow-hidden">
-                  <div className="px-4 py-3 border-b border-gray-100">
-                    <p className="text-sm font-medium text-gray-900">
-                      {user?.name || "User"}
-                    </p>
-                    <p className="text-xs text-gray-500 truncate">
-                      {user?.email}
-                    </p>
-                  </div>
-                  <ul className="py-1 text-sm text-gray-700">
-                       {user?.role==='admin' ? 
-                      <>
-                       <li>
-                      <a
-                        href="/admin"
-                        className="block px-4 py-2 hover:bg-gray-50"
-                      >
-                     Admin Dashboard
-                      </a>
-                    </li>
-                      </> 
-                      :(
-                        <>
-                        </>
-                      )}
-                   
-                    <li>
-                      <button
-                        onClick={logout}
-                        className="w-full text-left px-4 py-2 hover:bg-gray-50"
-                      >
-                        Sign out
-                      </button>
-                    </li>
-                  </ul>
-                </div>
-              )}
-            </div>
-          ) : (
-            <button
-             onClick={()=>{
-                 if (!user) {
-    // toast.success("You must log in to buy this document."); 
-    setShowLoginModal(true);
-    return;
-  }
-             }}
-              className="text-sm font-medium text-gray-700 hover:text-emerald-600 transition"
-            >
-              Login
-            </button>
-          )}
-
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-2 rounded-md text-gray-600 hover:bg-gray-100 transition"
-          >
-            {isMenuOpen ? <X size={22} /> : <Menu size={22} />}
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="md:hidden border-t border-gray-100 bg-white shadow-sm">
-          <ul className="flex flex-col p-4 space-y-2">
-           
-              <li >
+            {user && (
+              <li>
                 <a
-                  href="#"
-                  className="block py-2 px-3 rounded-md text-gray-700 hover:bg-gray-100 hover:text-emerald-600 transition"
+                  href="/my-document"
+                  className="text-gray-700 hover:text-emerald-600 transition-colors duration-200"
                 >
-                Home
+                  My Document
                 </a>
               </li>
-            
-              <li >
-                <a
-                  href="#"
-                  className="block py-2 px-3 rounded-md text-gray-700 hover:bg-gray-100 hover:text-emerald-600 transition"
-                >
-                About
-                </a>
-              </li>
-              <li >
-                <a
-                  href="#"
-  className="block py-2 px-3 rounded-md text-gray-700 hover:bg-gray-100 hover:text-emerald-600 transition"
-                >
-                Services
-                </a>
-              </li>
-                 {user? <>
-             <li >
-              <a
-                href="my-document"
-            className="block py-2 px-3 rounded-md text-gray-700 hover:bg-gray-100 hover:text-emerald-600 transition"
-              >
-               My Document
-              </a>
-              
-            </li>
-            </>:(
-              <></>
-            )  }
-          {/* ))} */}
-      
-            
+            )}
           </ul>
+
+          {/* User + Icons + Mobile Menu */}
+          <div className="flex items-center gap-4">
+            {/* Search Icon */}
+            <button
+              onClick={() => console.log("Search clicked")}
+              className="p-2 rounded-full hover:bg-gray-100 transition"
+              aria-label="Search"
+            >
+              <Search size={20} className="text-gray-600" />
+            </button>
+
+            {/* Cart Icon */}
+            <button
+              onClick={() => console.log("Cart clicked")}
+              className="relative p-2 rounded-full hover:bg-gray-100 transition"
+              aria-label="Cart"
+            >
+              <ShoppingCart size={20} className="text-gray-600" />
+              {/* Optional cart badge */}
+              <span className="absolute top-1 right-1 bg-emerald-500 text-white text-[10px] font-semibold rounded-full w-4 h-4 flex items-center justify-center">
+                0
+              </span>
+            </button>
+
+            {/* User Menu / Login */}
+            {user ? (
+              <div className="md:relative hidden">
+                <button
+                  type="button"
+                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  className="flex items-center justify-center w-9 h-9 rounded-full bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition"
+                >
+                  {user?.name?.charAt(0).toUpperCase() ||
+                    user?.email?.charAt(0).toUpperCase() ||
+                    "U"}
+                </button>
+
+                {isUserMenuOpen && (
+                  <div className="absolute right-0 mt-3 w-48 rounded-lg bg-white shadow-lg border border-gray-100 overflow-hidden">
+                    <div className="px-4 py-3 border-b border-gray-100">
+                      <p className="text-sm font-medium text-gray-900">
+                        {user?.name || "User"}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate">
+                        {user?.email}
+                      </p>
+                    </div>
+                    <ul className="py-1 text-sm text-gray-700">
+                      {user?.role === "admin" && (
+                        <li>
+                          <a
+                            href="/admin"
+                            className="block px-4 py-2 hover:bg-gray-50"
+                          >
+                            Admin Dashboard
+                          </a>
+                        </li>
+                      )}
+                      <li>
+                        <button
+                          onClick={logout}
+                          className="w-full text-left px-4 py-2 hover:bg-gray-50"
+                        >
+                          Sign out
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button
+                onClick={() => setShowLoginModal(true)}
+                className="text-sm font-medium text-gray-700 hover:text-emerald-600 transition hidden md:block"
+              >
+                Login
+              </button>
+            )}
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="md:hidden p-2 rounded-md text-gray-600 hover:bg-gray-100 transition"
+            >
+              {isMenuOpen ? <X size={22} /> : <Menu size={22} />}
+            </button>
+          </div>
         </div>
-      )}
-    </nav>
+
+        {/* Mobile Menu */}
+        {isMenuOpen && (
+          <div className="md:hidden border-t border-gray-100 bg-white shadow-sm">
+            <ul className="flex flex-col p-4 space-y-2">
+              <li>
+                <a
+                  href="/"
+                  className="block py-2 px-3 rounded-md text-gray-700 hover:bg-gray-100 hover:text-emerald-600 transition"
+                >
+                  Home
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  className="block py-2 px-3 rounded-md text-gray-700 hover:bg-gray-100 hover:text-emerald-600 transition"
+                >
+                  About
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  className="block py-2 px-3 rounded-md text-gray-700 hover:bg-gray-100 hover:text-emerald-600 transition"
+                >
+                  Services
+                </a>
+              </li>
+              {user && (
+                <li>
+                  <a
+                    href="/my-document"
+                    className="block py-2 px-3 rounded-md text-gray-700 hover:bg-gray-100 hover:text-emerald-600 transition"
+                  >
+                    My Document
+                  </a>
+                </li>
+              )}
+            </ul>
+          </div>
+        )}
+      </nav>
     </>
   );
 };

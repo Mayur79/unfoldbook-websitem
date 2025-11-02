@@ -5,6 +5,8 @@ const DocumentSchema = new mongoose.Schema({
   description:String,
   fileKey: String,
   price: Number,
+  finalPrice  : Number,
+  discountPercent: Number,
   type: String,
   thumbnailImage: {
     data: Buffer,        // Binary data
