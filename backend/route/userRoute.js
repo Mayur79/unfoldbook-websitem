@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const User = require("../model/userModel");
 const paymentModel = require("../model/paymentModel");
-
+const middleware = require("../middleware/middleware");
 
 // GET all users (excluding password)
 router.get("/", async (req, res) => {
@@ -80,5 +80,69 @@ router.get("/user-doc-data", async (req, res) => {
   }
 });
 
+
+router.post("/wishlist/toggle",middleware, async (req, res) => {
+  try {
+    const { documentId } = req.body;
+    const user = await User.findById(req.user.id);
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const index = user.wishlist.indexOf(documentId);
+    if (index === -1) {
+      user.wishlist.push(documentId);
+    } else {
+      user.wishlist.splice(index, 1);
+    }
+
+    await user.save();
+    res.json({
+      wishlist: user.wishlist,
+      wishlistCount: user.wishlist.length,
+      message: index === -1 ? "Added to wishlist" : "Removed from wishlist",
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+
+router.post("/cart/toggle", middleware, async (req, res) => {
+  try {
+    const { documentId } = req.body;
+    const user = await User.findById(req.user.id);
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const index = user.cart.indexOf(documentId);
+    if (index === -1) {
+      user.cart.push(documentId);
+    } else {
+      user.cart.splice(index, 1);
+    }
+
+    await user.save();
+    res.json({
+      cart: user.cart,
+      cartCount: user.cart.length,
+      message: index === -1 ? "Added to cart" : "Removed from cart",
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+
+router.get("/getUserCart", middleware, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).populate("cart");
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.json({ cart: user.cart });
+  } catch (error) {
+    console.error("Error fetching cart:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 module.exports = router;

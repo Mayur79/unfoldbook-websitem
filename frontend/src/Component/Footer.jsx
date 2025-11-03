@@ -11,14 +11,14 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-[#111] text-white font-poppins">
+    <footer className="bg-blue-100 text-black font-poppins">
       <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 
         {/* Contact / Address Section */}
         <div>
           <img src={logo} alt="UnofldBook Logo" className="h-10 mb-4" />
           <h3 className="text-sm font-light mb-4">Publication Inc</h3>
-          <ul className="space-y-3 text-gray-300 text-sm">
+          <ul className="space-y-3 text-black text-sm">
             <li className="flex items-start gap-2">
               <MapPin size={18} className="mt-0.5" />
               Near Manshal Bhagat house, Gondia
@@ -49,7 +49,7 @@ export default function Footer() {
           </button>
 
           <ul
-            className={`overflow-hidden transition-all duration-300 text-gray-300 text-sm space-y-2 ${
+            className={`overflow-hidden transition-all duration-300 text-black text-sm space-y-2 ${
               openSection === "support" ? "max-h-60 mt-2" : "max-h-0 lg:max-h-none lg:mt-4"
             }`}
           >
@@ -77,7 +77,7 @@ export default function Footer() {
           </button>
 
           <ul
-            className={`overflow-hidden transition-all duration-300 text-gray-300 text-sm space-y-2 ${
+            className={`overflow-hidden transition-all duration-300 text-black text-sm space-y-2 ${
               openSection === "account" ? "max-h-60 mt-2" : "max-h-0 lg:max-h-none lg:mt-4"
             }`}
           >
@@ -111,7 +111,7 @@ export default function Footer() {
               openSection === "newsletter" ? "max-h-[500px] mt-2" : "max-h-0 lg:max-h-none lg:mt-3"
             }`}
           >
-            <p className="text-gray-400 text-sm mb-4">
+            <p className="text-black text-sm mb-4">
               Subscribe to our weekly student newsletter for inspirational stories and get 10% off your first purchase.
             </p>
 
@@ -119,9 +119,9 @@ export default function Footer() {
               <input
                 type="email"
                 placeholder="Enter your email"
-                className="flex-1 px-3 py-2 rounded-l-md bg-transparent border border-gray-500 focus:outline-none text-sm"
+                className="flex-1 px-3 py-2 rounded-l-md bg-transparent border border-gray-500 focus:outline-none text-sm text-black"
               />
-              <button className="bg-[#E61E5C] px-4 rounded-r-md text-sm font-semibold">
+              <button className="bg-blue-600 px-4 rounded-r-md text-sm font-semibold">
                 Subscribe
               </button>
             </div>
@@ -139,8 +139,8 @@ export default function Footer() {
       </div>
 
       {/* Footer Bottom Bar */}
-      <div className="bg-[#E61E5C] text-center text-sm py-3">
-        Copyright © {new Date().getFullYear()} Bhim Publication. All rights reserved.
+      <div className="bg-blue-600 text-center text-sm py-3">
+        Copyright © {new Date().getFullYear()} UnFoldBoook Publication. All rights reserved.
       </div>
     </footer>
   );

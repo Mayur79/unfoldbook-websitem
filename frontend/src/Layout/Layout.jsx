@@ -9,7 +9,7 @@ import BottomNavBar from "../Component/BottomNavbar";
 export default function Layout({ children }) {
   return (
     <div className="flex flex-col min-h-screen">
-         <Toaster position="top-right" richColors />
+         <Toaster  richColors />
       <Navbar />
       
       <main className="flex-grow ">{children}</main>

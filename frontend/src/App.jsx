@@ -19,6 +19,9 @@ import AllDocument from "./Component/AllDocuments";
 import SignupModal from './Pages/SignupModal';
 import AdminRoute from './services/AdminRoute';
 import MyDocument from './Pages/MyDocument';
+import DocDetail from './Pages/DocumentDetail';
+import CartPage from './Pages/CartPage';
+import CheckoutPage from './Pages/CheckoutPage';
 function App() {
 
    const [showLoginModal, setShowLoginModal] = useState(false);
@@ -65,6 +68,30 @@ function App() {
                 element={
                      <PrivateRoute openLoginModal={() => setShowLoginModal(true)}>
                     <Dashboard />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/doc/:id"
+                element={
+                     <PrivateRoute openLoginModal={() => setShowLoginModal(true)}>
+                    <DocDetail />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/cart"
+                element={
+                     <PrivateRoute openLoginModal={() => setShowLoginModal(true)}>
+                    <CartPage />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/checkout"
+                element={
+                     <PrivateRoute openLoginModal={() => setShowLoginModal(true)}>
+                    <CheckoutPage />
                   </PrivateRoute>
                 }
               />

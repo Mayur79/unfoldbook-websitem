@@ -139,6 +139,33 @@ router.get("/", async (req, res) => {
     res.status(500).json({ message: "Failed to fetch documents" });
   }
 });
+router.get("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Fetch a single document and populate category name
+    const doc = await documentModel.findById(id).populate("category", "categoryName");
+
+    if (!doc) {
+      return res.status(404).json({ message: "Document not found" });
+    }
+
+    // Convert Mongoose doc to plain JS object
+    const docObj = doc.toObject();
+
+    // Add base64 thumbnail if available
+    if (doc.thumbnailImage && doc.thumbnailImage.data) {
+      docObj.thumbnailBase64 = `data:${doc.thumbnailImage.contentType};base64,${doc.thumbnailImage.data.toString("base64")}`;
+    } else {
+      docObj.thumbnailBase64 = null;
+    }
+
+    res.json(docObj);
+  } catch (err) {
+    console.error("Error fetching document:", err);
+    res.status(500).json({ message: "Failed to fetch document" });
+  }
+});
 
 router.get("/:id/access", middleware, async (req, res) => {
   const doc = await documentModel.findById(req.params.id);

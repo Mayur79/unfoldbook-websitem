@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import api from '../services/api';
 import { useNavigate } from 'react-router-dom';
 import {jwtDecode} from "jwt-decode";
+import { toast } from 'sonner';
 
 const AuthContext = createContext();
 
@@ -90,6 +91,50 @@ export function AuthProvider({ children }) {
     }
   }
 
+    async function toggleWishlist(documentId) {
+    if (!user) {
+      toast.info("Please login to manage your wishlist.");
+      return;
+    }
+
+    try {
+      const res = await api.post("/api/users/wishlist/toggle", { documentId });
+      const { wishlist, message } = res.data;
+
+      setUser((prev) => ({
+        ...prev,
+        wishlist,
+      }));
+
+      toast.success(message);
+    } catch (err) {
+      console.error("Wishlist toggle failed:", err);
+      toast.error("Failed to update wishlist.");
+    }
+  }
+
+  // 🛒 Toggle Cart
+  async function toggleCart(documentId) {
+    if (!user) {
+      toast.info("Please login to add items to your cart.");
+      return;
+    }
+
+    try {
+      const res = await api.post("/api/users/cart/toggle", { documentId });
+      const { cart, message } = res.data;
+
+      setUser((prev) => ({
+        ...prev,
+        cart,
+      }));
+
+      toast.success(message);
+    } catch (err) {
+      console.error("Cart toggle failed:", err);
+      toast.error("Failed to update cart.");
+    }
+  }
   // Logout function
    function logout() {
     localStorage.removeItem("token");
@@ -109,6 +154,8 @@ export function AuthProvider({ children }) {
         logout,
         fetchUser,
         googleLogin,
+ toggleWishlist,
+        toggleCart,
         isAuthenticated: !!user,
       }}
     >

@@ -9,7 +9,20 @@ const UserSchema = new mongoose.Schema(
      role:{ type: String,
     enum: ['user', 'admin'],
     default:'user'
-     }
+     },
+       wishlist: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "DocumentModel",
+      },
+    ],
+    cart: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "DocumentModel",
+      },
+    ],
+     purchasedDocs: [{ type: mongoose.Schema.Types.ObjectId, ref: "DocumentModel" }],
   },
   { timestamps: true }
 );

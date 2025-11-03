@@ -4,13 +4,14 @@ import { Menu, X, Search, ShoppingCart } from "lucide-react";
 import LoginModal from "../Pages/Login";
 import SignupModal from "../Pages/SignupModal";
 import logo from "../assets/logo.png";
+import { useNavigate } from "react-router-dom";
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const { user, logout } = useAuth();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isSignupOpen, setIsSignupOpen] = useState(false);
-
+const navigate = useNavigate();
   return (
     <>
       <LoginModal
@@ -24,7 +25,7 @@ const Navbar = () => {
         onOpenLogin={() => setShowLoginModal(true)}
       />
 
-      <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm font-poppins">
+      <nav className="sticky top-0 z-50 bg-blue-100 backdrop-blur-md border-b border-gray-100 shadow-sm font-poppins">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
           {/* Logo */}
           <a href="/" className="flex items-center gap-2 border-0">
@@ -84,15 +85,20 @@ const Navbar = () => {
 
             {/* Cart Icon */}
             <button
-              onClick={() => console.log("Cart clicked")}
+              onClick={() =>navigate("/cart")}
               className="relative p-2 rounded-full hover:bg-gray-100 transition"
               aria-label="Cart"
             >
               <ShoppingCart size={20} className="text-gray-600" />
               {/* Optional cart badge */}
-              <span className="absolute top-1 right-1 bg-emerald-500 text-white text-[10px] font-semibold rounded-full w-4 h-4 flex items-center justify-center">
+              {user?.cart?.length > 0 ?( <span className="absolute top-1 right-1 bg-emerald-500 text-white text-[10px] font-semibold rounded-full w-4 h-4 flex items-center justify-center">
+                {user?.cart?.length}
+              </span>):(
+                 <span className="absolute top-1 right-1 bg-emerald-500 text-white text-[10px] font-semibold rounded-full w-4 h-4 flex items-center justify-center">
                 0
               </span>
+              )}
+             
             </button>
 
             {/* User Menu / Login */}

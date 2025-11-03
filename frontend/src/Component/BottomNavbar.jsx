@@ -17,9 +17,6 @@ const BottomNavBar = () => {
   const location = useLocation();
   const { user, logout } = useAuth();
 
-  // Temporary hardcoded values (can replace with context/localStorage later)
-  const [cartItems, setCartItems] = useState(2);
-  const [wishlistItems, setWishlistItems] = useState(2);
 
   // Modals
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -28,8 +25,8 @@ const BottomNavBar = () => {
 
   const navItems = [
     { label: "Shop", icon: Store, path: "/" },
-    { label: "Wishlist", icon: Heart, path: "/wishlist", count: wishlistItems },
-    { label: "Cart", icon: ShoppingCart, path: "/cart", count: cartItems },
+    { label: "Wishlist", icon: Heart, path: "/wishlist", count: user?.wishlist?.length || 0},
+    { label: "Cart", icon: ShoppingCart, path: "/cart",  count: user?.cart?.length || 0 },
     { label: "Search", icon: Search, path: "/search" },
   ];
 
@@ -67,13 +64,14 @@ const BottomNavBar = () => {
               } hover:text-emerald-600 transition`}
             >
               <Icon size={26} />
-              {count > 0 && (
-                <span
-                  className={`absolute -top-1 -right-1 bg-black text-white text-[10px] font-semibold rounded-full w-4 h-4 flex items-center justify-center`}
-                >
-                  {count}
-                </span>
-              )}
+     {typeof count === "number" && (
+  <span
+    className={`absolute -top-1 -right-1 bg-black text-white text-[10px] font-semibold rounded-full w-4 h-4 flex items-center justify-center`}
+  >
+    {count}
+  </span>
+)}
+
               <span className="mt-1 font-medium">{label}</span>
             </button>
           );

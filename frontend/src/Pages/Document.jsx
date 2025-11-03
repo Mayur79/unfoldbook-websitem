@@ -20,7 +20,7 @@ export default function Documents() {
   const [isSignupOpen, setIsSignupOpen] = useState(false);
   const navigate = useNavigate();
   const [current, setCurrent] = useState(0);
-  const { user } = useAuth();
+  const { user , toggleWishlist, toggleCart} = useAuth();
   // Generate random rating between 3.5 and 5.0 (1 decimal)
 const getRandomRating = () => (Math.random() * (5 - 4) + 4).toFixed(1);
 const getRandomCount = () => Math.floor(Math.random() * 200) + 20; // between 20–220
@@ -234,7 +234,7 @@ const selectedCategoryName =
       </div>
 
       <div className="text-center mb-8 sm:mb-12">
-        <h2 className="text-2xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#4f46e5] to-[#22c55e]">
+        <h2 className="text-2xl sm:text-4xl font-extrabold text-blue-600">
           Buy - Download - Print
         </h2>
         <p className="text-[#64748b] mt-2 ">
@@ -264,7 +264,7 @@ const selectedCategoryName =
         className={`flex-shrink-0 px-4 py-1.5 sm:px-5 sm:py-2 rounded-full text-sm font-medium border transition-all duration-300 
           ${
             selectedCategory === cat._id
-              ? "bg-gradient-to-r from-blue-600 to-green-500 text-white border-transparent shadow-md scale-105"
+              ? "bg-blue-600 border-transparent shadow-md scale-105"
               : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
           }`}
       >
@@ -275,7 +275,7 @@ const selectedCategoryName =
 </div>
 
 
-  <h2 className="flex justify-center text-2xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#4f46e5] to-[#22c55e]">
+  <h2 className="flex justify-center text-2xl sm:text-4xl font-extrabold  text-blue-600">
   {selectedCategoryName}
 </h2>
 
@@ -284,6 +284,9 @@ const selectedCategoryName =
         {currentDocs.map((doc) => (
            <div
       key={doc._id}
+        onClick={() =>
+  navigate(`/doc/${doc._id}`, { state: { rating: doc.rating, ratingCount: doc.ratingCount } })
+}
       className="group relative bg-white  overflow-hidden transition-all duration-300"
     >
       {/* Top Section (Image + Discount Badge) */}
@@ -303,27 +306,39 @@ const selectedCategoryName =
       {/* Middle Section (Icons) */}
       <div className="flex justify-center gap-3 border-b border-gray-100 ">
         <button
-          onClick={() => view(doc)}
+         onClick={(e) => {
+  e.stopPropagation();
+  view(doc);
+}}
           className="w-9 h-9 flex items-center justify-center bg-gray-100 hover:bg-blue-100 rounded-full text-gray-600 hover:text-blue-600 transition"
         >
           <Eye size={16} />
         </button>
         <button
-          onClick={() => buy(doc)}
+       onClick={(e) => {
+  e.stopPropagation();
+  toggleCart(doc._id);
+}}
           className="w-9 h-9 flex items-center justify-center bg-gray-100 hover:bg-green-100 rounded-full text-gray-600 hover:text-green-600 transition"
         >
-          <ShoppingCart size={16} />
+          <ShoppingCart size={16} fill={user?.cart?.includes(doc._id) ? "#16a34a" : "none"}
+    stroke="#16a34a"
+ />
         </button>
         <button
-          onClick={() => share(doc)}
+       onClick={(e) => {
+  e.stopPropagation();
+  toggleWishlist(doc._id);
+}}
           className="w-9 h-9 flex items-center justify-center bg-gray-100 hover:bg-pink-100 rounded-full text-gray-600 hover:text-pink-600 transition"
         >
-          <Heart size={16} />
+          <Heart size={16}   fill={user?.wishlist?.includes(doc._id) ? "#ff4d6d" : "none"}
+    stroke="#ff4d6d"/>
         </button>
       </div>
 
       {/* Bottom Section (Title + Prices + Rating) */}
-      <div className="px-4 py-3 bg-[#F1F7FA] mt-2 rounded-md">
+      <div className="px-4 py-3 bg-blue-100 mt-2 rounded-md">
         <h3 className="text-sm sm:text-base font-medium text-[#312427] leading-tight line-clamp-2 mb-1">
           {doc.title}
         </h3>
@@ -377,7 +392,7 @@ const selectedCategoryName =
           className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full font-medium text-sm flex items-center justify-center transition-all
             ${
               currentPage === i + 1
-                ? 'bg-gradient-to-r from-blue-600 to-green-500 text-white shadow-md scale-105'
+                ? 'bg-blue-600 text-white shadow-md scale-105'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
         >
