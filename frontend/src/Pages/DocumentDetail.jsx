@@ -45,7 +45,7 @@ export default function DocDetail() {
             <img
               src={selectedImage || pdfimage}
               alt={doc.title}
-              className="w-full h-64 sm:h-[420px] object-contain rounded-md hover:scale-105 transition-transform duration-300"
+              className="w-full h-96 sm:h-96 object-contain rounded-md hover:scale-105 transition-transform duration-300"
             />
             {doc.discountPercent && (
               <span className="absolute top-3 right-3 bg-orange-500 text-white text-sm sm:text-base font-semibold px-3 py-1 rounded-full shadow-md">
