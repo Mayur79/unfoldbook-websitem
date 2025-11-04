@@ -7,7 +7,12 @@ const paymentModel = require("../model/paymentModel");
 const middleware = require("../middleware/middleware");
 const dotenv = require("dotenv");
 const userModel = require("../model/userModel");
-
+const AWS = require("aws-sdk");
+const s3 = new AWS.S3({
+  region: process.env.AWS_REGION,
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+});
 dotenv.config();
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -73,35 +78,45 @@ router.get("/purchased", middleware, async (req, res) => {
 });
 
 router.get("/my-document", middleware, async (req, res) => {
-try {
-    // Find all payments for the user and populate the document details
-    const payments = await paymentModel
-      .find({ userId: req.user.id })
-      .populate({
-        path: "documentId",
-        model: "DocumentModel",
-        select: "-__v", // exclude __v field
-      });
+  try {
+    const userId = req.user.id;
 
-    // Map payments to documents
-    const purchasedDocs = payments.map((p) => {
-      const doc = p.documentId.toObject();
+    // Fetch the user along with purchasedDocs (DocumentModel)
+    const user = await userModel.findById(userId).populate("purchasedDocs");
 
-      // Convert thumbnail buffer to base64 if exists
-      if (doc.thumbnailImage?.data) {
-        doc.thumbnailBase64 = `data:${doc.thumbnailImage.contentType};base64,${doc.thumbnailImage.data.toString('base64')}`;
-      }
+    if (!user || !user.purchasedDocs?.length) {
+      return res.status(200).json([]);
+    }
 
-      return doc;
-    });
+    // Generate presigned URLs for thumbnails
+    const docsWithThumbnails = await Promise.all(
+      user.purchasedDocs.map(async (doc) => {
+        const docObj = doc.toObject();
 
-    
-    res.json(purchasedDocs);
-  } catch (error) {
-    console.error("Error fetching purchased docs:", error);
-    res.status(500).json({ message: "Server error" });
+        if (doc.thumbnailKey) {
+          const thumbnailUrl = s3.getSignedUrl("getObject", {
+            Bucket: process.env.S3_BUCKET,
+            Key: doc.thumbnailKey,
+            Expires: 60 * 60, // 1 hour
+          });
+          docObj.thumbnailBase64 = thumbnailUrl; // store URL for frontend
+        } else {
+          docObj.thumbnailBase64 = null;
+        }
+
+        return docObj;
+      })
+    );
+
+    console.log("Fetched purchased docs:", docsWithThumbnails);
+    res.json(docsWithThumbnails);
+  } catch (err) {
+    console.error("❌ Error fetching purchased documents:", err);
+    res.status(500).json({ message: "Failed to fetch purchased documents" });
   }
 });
+
+
 
 router.post("/create-order", async (req, res) => {
   try {

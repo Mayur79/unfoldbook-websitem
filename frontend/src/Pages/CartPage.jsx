@@ -4,6 +4,7 @@ import api from "../services/api";
 import pdfimage from "../assets/pdfimage.png";
 import { Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function CartPage() {
   const { user, toggleCart } = useAuth();
@@ -36,54 +37,72 @@ export default function CartPage() {
 
   return (
     <div className="max-w-5xl mx-auto p-4 sm:p-8 font-poppins">
-      <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-gray-800">
-        Your Cart
+      <h1 className="text-3xl font-bold mb-8 text-gray-800 text-center">
+        🛍️ Your Cart
       </h1>
 
       {cartDocs.length === 0 ? (
-        <p className="text-gray-500 text-center mt-10">
+        <p className="text-gray-500 text-center mt-20 text-lg">
           Your cart is empty 🛒
         </p>
       ) : (
         <>
-          <div className="bg-white shadow-md rounded-lg p-4 sm:p-6">
-            {cartDocs.map((doc) => (
-              <div
-                key={doc._id}
-                className="flex items-center justify-between border-b border-gray-100 pb-3 mb-3"
-              >
-                <div className="flex items-center space-x-4">
-                  <img
-                    src={doc.thumbnailBase64 || pdfimage}
-                    alt={doc.title}
-                    className="w-16 h-16 object-contain rounded-md"
-                  />
-                  <div>
-                    <h2 className="font-semibold text-gray-800">{doc.title}</h2>
-                    <p className="text-sm text-gray-500">₹{doc.finalPrice}</p>
-                  </div>
-                </div>
-
-                <button
-                  className="p-2 hover:bg-red-100 rounded-full transition"
-                  onClick={() => toggleCart(doc._id)}
+          <div className="bg-white shadow-xl rounded-2xl p-6 divide-y divide-gray-100">
+            <AnimatePresence>
+              {cartDocs.map((doc) => (
+                <motion.div
+                  key={doc._id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="flex flex-col sm:flex-row sm:items-center justify-between py-4 gap-4"
                 >
-                  <Trash2 className="text-red-500" size={18} />
-                </button>
-              </div>
-            ))}
+                  <div className="flex items-center gap-4">
+                    <img
+                      src={doc.thumbnailBase64 || pdfimage}
+                      alt={doc.title}
+                      className="w-20 h-20 object-contain "
+                    />
+                    <div>
+                      <h2 className="font-semibold text-lg text-gray-800">
+                        {doc.title}
+                      </h2>
+                      <p className="text-sm text-gray-500 mt-1">
+                        Price:{" "}
+                        <span className="text-blue-600 font-medium">
+                          ₹{doc.finalPrice}
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    className="p-2 hover:bg-red-100 rounded-full transition self-end sm:self-auto"
+                    onClick={() => toggleCart(doc._id)}
+                    title="Remove from cart"
+                  >
+                    <Trash2 className="text-red-500" size={20} />
+                  </button>
+                </motion.div>
+              ))}
+            </AnimatePresence>
           </div>
 
-          {/* Summary */}
-          <div className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between bg-gray-50 p-4 rounded-lg">
-            <h3 className="text-lg font-semibold text-gray-700">
-              Total: <span className="text-blue-600">₹{totalPrice.toFixed(2)}</span>
+          {/* Summary Section */}
+          <div className="mt-8 bg-gray-50 border border-gray-100 rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-sm">
+            <h3 className="text-xl font-semibold text-gray-700">
+              Total:{" "}
+              <span className="text-blue-600">
+                ₹{totalPrice.toFixed(2)}
+              </span>
             </h3>
             <button
-              className="mt-4 sm:mt-0 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full transition"
-              onClick={() => navigate("/checkout", { state: { totalPrice, cartDocs } })}
+              onClick={() =>
+                navigate("/checkout", { state: { totalPrice, cartDocs } })
+              }
+              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full text-sm font-semibold tracking-wide transition-all shadow-md hover:shadow-lg"
             >
-              Proceed to Checkout
+              Proceed to Checkout →
             </button>
           </div>
         </>

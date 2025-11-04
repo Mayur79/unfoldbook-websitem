@@ -8,10 +8,8 @@ const DocumentSchema = new mongoose.Schema({
   finalPrice  : Number,
   discountPercent: Number,
   type: String,
-  thumbnailImage: {
-    data: Buffer,        // Binary data
-    contentType: String, // e.g. image/png
-  },
+  extraImageKeys: [String],
+  thumbnailKey: String,
     backupStatus: {
       type: String,
       enum: ["pending", "completed", "failed"],

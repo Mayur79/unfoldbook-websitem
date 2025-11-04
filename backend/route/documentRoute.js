@@ -33,109 +33,132 @@ const deleteFromS3 = async (key, bucket) => {
   }
 };
 
-router.post("/presign", middleware, async (req, res) => {
+router.post("/presign", async (req, res) => {
   try {
-    const { filename, filetype } = req.body;
+    const { filename, filetype, uploadType } = req.body;
 
-    if (!filename || !filetype) {
-      return res.status(400).json({ message: "Missing filename or filetype" });
-    }
+    // Default folder is "documents" if not specified
+    let folder = "documents";
+    if (uploadType === "thumbnail") folder = "thumbnails";
+    else if (uploadType === "image") folder = "images";
+    else if (uploadType === "preview") folder = "previews";
 
-    const fileKey = `${Date.now()}_${filename}`;
+    // Create unique key
+    const fileKey = `${folder}/${Date.now()}_${filename}`;
 
-    const uploadUrl = s3.getSignedUrl("putObject", {
+    const params = {
       Bucket: process.env.S3_BUCKET,
       Key: fileKey,
+      Expires: 60, // 1 minute
       ContentType: filetype,
-      Expires: 300, 
-    });
+    };
 
-    return res.json({ uploadUrl, fileKey });
+    const uploadURL = await s3.getSignedUrlPromise("putObject", params);
+    const fileURL = `https://${process.env.S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileKey}`;
+
+     res.json({ uploadURL, fileURL, fileKey });
   } catch (error) {
-    console.error("❌ Error generating presigned URL:", error);
-    return res.status(500).json({ message: "Failed to generate presigned URL" });
+    console.error("Error creating presigned URL:", error);
+    res.status(500).json({ error: "Failed to generate presigned URL" });
   }
 });
 
-
-router.post("/saveMetadata", middleware, upload.single("thumbnail"), async (req, res) => {
+// route: POST /saveMetadata
+router.post("/saveMetadata", middleware, async (req, res) => {
   try {
-    const { title, originalPrice,discountPercent,finalPrice, type, category, fileKey, description ,} = req.body;
-    const thumbnail = req.file;
-
-    if (!fileKey) {
-      return res.status(400).json({ message: "Missing file key from upload" });
-    }
-
-    const newDoc = new documentModel({
+    const {
       title,
-      price:originalPrice,
-      finalPrice,
+      originalPrice,
       discountPercent,
-      type,
+      finalPrice,
       description,
       category,
       fileKey,
+      thumbnailKey,
+      extraImageKeys = [],
+    } = req.body;
+
+    if (!fileKey || !thumbnailKey) {
+      return res.status(400).json({ message: "Missing fileKey or thumbnailKey" });
+    }
+
+    // Create document record
+    const newDoc = new documentModel({
+      title,
+      description,
+      price: originalPrice,
+      discountPercent,
+      finalPrice,
+      category,
+      fileKey,          // main PDF
+      thumbnailKey,     // main thumbnail
+      extraImageKeys,   // additional images
       backupStatus: "pending",
-      thumbnailImage: thumbnail
-        ? {
-            data: thumbnail.buffer,
-            contentType: thumbnail.mimetype,
-          }
-        : undefined,
     });
 
     await newDoc.save();
 
-   
-    const backupKey = fileKey;
-
+    // 🔹 Start backup ONLY for the main PDF
     s3.copyObject({
       Bucket: process.env.S3_BACKUP_BUCKET,
       CopySource: `${process.env.S3_BUCKET}/${fileKey}`,
-      Key: backupKey,
+      Key: fileKey, // same key path in backup bucket
     })
       .promise()
       .then(async () => {
-        console.log(`✅ Backup successful for ${backupKey}`);
+        console.log(`✅ Backup successful for ${fileKey}`);
         await documentModel.findByIdAndUpdate(newDoc._id, {
           backupStatus: "completed",
         });
       })
       .catch(async (err) => {
-        console.error(`⚠️ Backup failed for ${backupKey}:`, err);
+        console.error(`⚠️ Backup failed for ${fileKey}:`, err);
         await documentModel.findByIdAndUpdate(newDoc._id, {
           backupStatus: "failed",
         });
       });
-      
+
+    // Respond immediately (don’t wait for backup to finish)
     return res.status(200).json({
-      message: "Document metadata saved. Backup in progress.",
+      message: "Document metadata saved. PDF backup in progress.",
       document: newDoc,
     });
-  } catch (error) {
-    console.error("❌ Error saving metadata:", error);
+  } catch (err) {
+    console.error("❌ Error saving metadata:", err);
     return res.status(500).json({ message: "Failed to save metadata" });
   }
 });
 
+
+
 router.get("/", async (req, res) => {
   try {
-   const docs = await documentModel.find().populate('category', 'categoryName');
-   
-    const docsWithThumbnails = docs.map((doc) => {
-      const docObj = doc.toObject();
-      if (doc.thumbnailImage && doc.thumbnailImage.data) {
-        docObj.thumbnailBase64 = `data:${doc.thumbnailImage.contentType};base64,${doc.thumbnailImage.data.toString('base64')}`;
-      } else {
-        docObj.thumbnailBase64 = null;
-      }
-      return docObj;
-    });
+    const docs = await documentModel.find().populate("category", "categoryName");
+
+    // Convert to JSON with S3 image URLs
+    const docsWithThumbnails = await Promise.all(
+      docs.map(async (doc) => {
+        const docObj = doc.toObject();
+
+        // Generate a presigned URL for the thumbnail from S3
+        if (doc.thumbnailKey) {
+          const thumbnailUrl = s3.getSignedUrl("getObject", {
+            Bucket: process.env.S3_BUCKET,
+            Key: doc.thumbnailKey,
+            Expires: 60 * 60, // 1 hour (you can adjust)
+          });
+          docObj.thumbnailBase64 = thumbnailUrl;
+        } else {
+          docObj.thumbnailBase64 = null;
+        }
+
+        return docObj;
+      })
+    );
 
     res.json(docsWithThumbnails);
   } catch (err) {
-    console.error(err);
+    console.error("❌ Error fetching documents:", err);
     res.status(500).json({ message: "Failed to fetch documents" });
   }
 });
@@ -143,29 +166,54 @@ router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Fetch a single document and populate category name
+    // Fetch single document and populate category
     const doc = await documentModel.findById(id).populate("category", "categoryName");
-
     if (!doc) {
       return res.status(404).json({ message: "Document not found" });
     }
 
-    // Convert Mongoose doc to plain JS object
     const docObj = doc.toObject();
 
-    // Add base64 thumbnail if available
-    if (doc.thumbnailImage && doc.thumbnailImage.data) {
-      docObj.thumbnailBase64 = `data:${doc.thumbnailImage.contentType};base64,${doc.thumbnailImage.data.toString("base64")}`;
+    // 🖼️ Generate signed URL for thumbnail if exists
+    if (doc.thumbnailKey) {
+      docObj.thumbnailURL = s3.getSignedUrl("getObject", {
+        Bucket: process.env.S3_BUCKET,
+        Key: doc.thumbnailKey,
+        Expires: 3600, // 1 hour
+      });
     } else {
-      docObj.thumbnailBase64 = null;
+      docObj.thumbnailURL = null;
+    }
+
+    // 🖼️ Generate signed URLs for extra images (if any)
+    if (doc.extraImageKeys && doc.extraImageKeys.length > 0) {
+      docObj.extraImageURLs = doc.extraImageKeys.map((key) =>
+        s3.getSignedUrl("getObject", {
+          Bucket: process.env.S3_BUCKET,
+          Key: key,
+          Expires: 3600, // 1 hour
+        })
+      );
+    } else {
+      docObj.extraImageURLs = [];
+    }
+
+    // 📄 (Optional) You can also include a signed PDF URL if you need it in detail view
+    if (doc.fileKey) {
+      docObj.fileURL = s3.getSignedUrl("getObject", {
+        Bucket: process.env.S3_BUCKET,
+        Key: doc.fileKey,
+        Expires: 3600,
+      });
     }
 
     res.json(docObj);
   } catch (err) {
-    console.error("Error fetching document:", err);
+    console.error("❌ Error fetching document:", err);
     res.status(500).json({ message: "Failed to fetch document" });
   }
 });
+
 
 router.get("/:id/access", middleware, async (req, res) => {
   const doc = await documentModel.findById(req.params.id);
@@ -230,14 +278,14 @@ router.get("/:id/view", middleware, async (req, res) => {
 router.get("/:id/presign", middleware, async (req, res) => {
   try {
     const doc = await documentModel.findById(req.params.id);
-    if (!doc) return res.status(404).json({ message: "Document not found" });
+    // if (!doc) return res.status(404).json({ message: "Document not found" });
 
-    const purchased = await paymentModel.findOne({
-      userId: req.user.id,
-      documentId: doc._id,
-    });
-    if (!purchased)
-      return res.status(403).json({ message: "You haven't purchased this document" });
+    // const purchased = await paymentModel.findOne({
+    //   userId: req.user.id,
+    //   documentId: doc._id,
+    // });
+    // if (!purchased)
+    //   return res.status(403).json({ message: "You haven't purchased this document" });
 
     const params = {
       Bucket: process.env.S3_BUCKET,
@@ -342,13 +390,13 @@ router.get("/:id/share", middleware, async (req, res) => {
     const doc = await documentModel.findById(req.params.id);
     if (!doc) return res.status(404).json({ message: "Document not found" });
 
-    // Ensure user purchased it
-    const purchased = await paymentModel.findOne({
-      userId: req.user.id,
-      documentId: doc._id,
-    });
-    if (!purchased)
-      return res.status(403).json({ message: "You haven't purchased this document" });
+    // // Ensure user purchased it
+    // const purchased = await paymentModel.findOne({
+    //   userId: req.user.id,
+    //   documentId: doc._id,
+    // });
+    // if (!purchased)
+    //   return res.status(403).json({ message: "You haven't purchased this document" });
 
     // Create short-lived JWT (e.g. expires in 15 minutes)
     const token = jwt.sign(

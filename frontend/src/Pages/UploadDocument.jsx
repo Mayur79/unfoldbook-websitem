@@ -16,7 +16,8 @@ const UploadDocument = () => {
 const [originalPrice, setOriginalPrice] = useState("");
 const [discountPercent, setDiscountPercent] = useState("");
 const [finalPrice, setFinalPrice] = useState("");
-
+const [extraImages, setExtraImages] = useState([]); // 4–5 images
+const [extraPreviews, setExtraPreviews] = useState([]);
 
 useEffect(() => {
   if (originalPrice && discountPercent) {
@@ -30,7 +31,7 @@ useEffect(() => {
   useEffect(() => {
     async function fetchCategories() {
       try {
-        const res = await api.get("/api/v1/doc/getCategory");
+        const res = await api.get("/api/v1/doc/categories/list");
         setCategories(res.data);
       } catch (err) {
         console.error("Error fetching categories:", err);
@@ -47,56 +48,99 @@ useEffect(() => {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!file || !thumbnail) {
-      toast.warning("Both document and thumbnail are required");
-      return;
+  const handleExtraImagesChange = (e) => {
+  const files = Array.from(e.target.files);
+  if (files.length > 5) {
+    toast.warning("You can upload up to 5 extra images only");
+    return;
+  }
+  setExtraImages(files);
+  setExtraPreviews(files.map((f) => URL.createObjectURL(f)));
+};
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  if (!file || !thumbnail) {
+    toast.warning("Both document and thumbnail are required");
+    return;
+  }
+  setIsUploading(true);
+
+  try {
+    // 1️⃣ Get presigned URL for main document
+    const { data: docData } = await api.post("/api/v1/doc/presign", {
+      filename: file.name,
+      filetype: file.type,
+      uploadType: "document",
+    });
+
+    // Upload PDF file to S3
+    await axios.put(docData.uploadURL, file, {
+      headers: { "Content-Type": file.type },
+    });
+
+    // 2️⃣ Get presigned URL for thumbnail
+    const { data: thumbData } = await api.post("/api/v1/doc/presign", {
+      filename: thumbnail.name,
+      filetype: thumbnail.type,
+      uploadType: "thumbnail",
+    });
+
+    // Upload thumbnail image
+    await axios.put(thumbData.uploadURL, thumbnail, {
+      headers: { "Content-Type": thumbnail.type },
+    });
+
+    // 3️⃣ Upload extra images (if any)
+    const extraImageKeys = [];
+    for (const img of extraImages) {
+      const { data: imgData } = await api.post("/api/v1/doc/presign", {
+        filename: img.name,
+        filetype: img.type,
+        uploadType: "image",
+      });
+
+      await axios.put(imgData.uploadURL, img, {
+        headers: { "Content-Type": img.type },
+      });
+
+      extraImageKeys.push(imgData.fileKey);
     }
-    setIsUploading(true);
 
-    try {
-      const { data } = await api.post("/api/v1/doc/presign", {
-        filename: file.name,
-        filetype: file.type,
-      });
+    // 4️⃣ Save metadata
+    const formData = {
+      title,
+      description,
+      originalPrice,
+      discountPercent,
+      finalPrice,
+      category: selectedCategory,
+      fileKey: docData.fileKey,
+      thumbnailKey: thumbData.fileKey,
+      extraImageKeys,
+    };
 
-      await axios.put(data.uploadUrl, file, {
-        headers: { "Content-Type": file.type },
-      });
+    await api.post("/api/v1/doc/saveMetadata", formData);
 
-      const formData = new FormData();
-      formData.append("title", title);
-      formData.append("description", description);
-     formData.append("originalPrice", originalPrice);
-formData.append("discountPercent", discountPercent);
-formData.append("finalPrice", finalPrice);
+    toast.success("Upload successful!");
+    setTitle("");
+    setDescription("");
+    setOriginalPrice("");
+    setDiscountPercent("");
+    setFinalPrice("");
+    setFile(null);
+    setThumbnail(null);
+    setPreview(null);
+    setExtraImages([]);
+    setExtraPreviews([]);
+    setSelectedCategory("");
+  } catch (error) {
+    console.error("Upload error:", error);
+    toast.error("Upload failed. Please try again.");
+  } finally {
+    setIsUploading(false);
+  }
+};
 
-      formData.append("category", selectedCategory);
-      formData.append("fileKey", data.fileKey);
-      formData.append("thumbnail", thumbnail);
-
-      await api.post("/api/v1/doc/saveMetadata", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-
-      toast.success("Upload successful!");
-      setTitle("");
-      setDescription("");
-      setOriginalPrice("");
-      setFinalPrice("");
-      setDiscountPercent("");
-      setFile(null);
-      setThumbnail(null);
-      setPreview(null);
-      setSelectedCategory("");
-    } catch (error) {
-      console.error("Upload error:", error);
-      toast.error("Upload failed. Please try again.");
-    } finally {
-      setIsUploading(false);
-    }
-  };
 
   return (
     <div className="flex bg-gray-50 min-h-screen">
@@ -223,6 +267,31 @@ formData.append("finalPrice", finalPrice);
                 </p>
               </label>
             </div>
+            {/* Extra Images Upload */}
+<div className="border-2 border-dashed border-gray-300 rounded-2xl p-4 bg-gray-50">
+  <p className="font-semibold text-gray-700 mb-2">Additional Images (max 5)</p>
+  <div className="flex flex-wrap gap-3">
+    {extraPreviews.map((img, i) => (
+      <img
+        key={i}
+        src={img}
+        alt={`Extra ${i}`}
+        className="w-24 h-24 object-cover rounded-lg shadow-sm"
+      />
+    ))}
+    <label className="flex items-center justify-center w-24 h-24 bg-blue-100 text-blue-600 rounded-lg cursor-pointer hover:bg-blue-200">
+      +
+      <input
+        type="file"
+        accept="image/*"
+        multiple
+        onChange={handleExtraImagesChange}
+        className="hidden"
+      />
+    </label>
+  </div>
+</div>
+
 
             {/* Price and Category */}
          {/* Price and Category Section */}
@@ -278,11 +347,11 @@ formData.append("finalPrice", finalPrice);
       value={selectedCategory}
       onChange={(e) => setSelectedCategory(e.target.value)}
       required
-      className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition bg-white"
+      className="z-50 w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition bg-white"
     >
       <option value="">Select category</option>
       {categories.map((cat) => (
-        <option key={cat._id} value={cat._id}>
+        <option key={cat._id} value={cat._id} className="z-50">
           {cat.categoryName}
         </option>
       ))}
