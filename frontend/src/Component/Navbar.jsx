@@ -174,7 +174,9 @@ const navigate = useNavigate();
                 user?null:(
    <li>
                 <button
-                onClick={() => setShowLoginModal(true)}
+                onClick={() =>{ setShowLoginModal(true);
+                  setIsMenuOpen(false);
+                }}
                   className="block py-2 px-3 rounded-md text-gray-700 hover:bg-gray-100 hover:text-emerald-600 transition"
                 >
                  Login

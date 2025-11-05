@@ -19,7 +19,7 @@ const MyDocument = () => {
 
   async function loadPurchased() {
     try {
-      const res = await api.get('/api/v1/pay/my-document');
+      const res = await api.get('/api/v1/doc/my-document/list');
       console.log('Purchased docs:', res.data);
       setPurchased(res.data);
     } catch (err) {

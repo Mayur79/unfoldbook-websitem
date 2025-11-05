@@ -9,6 +9,7 @@ const categoryModel = require("../model/categoryModel");
 const upload = multer({ storage: multer.memoryStorage() });
 const jwt=require("jsonwebtoken");
 const adminMiddleware = require("../middleware/adminMiddleware");
+const userModel = require("../model/userModel");
 const s3 = new AWS.S3({
   region: process.env.AWS_REGION,
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -541,6 +542,45 @@ router.delete("/delete/:type/:id", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Error deleting item", error: err.message });
+  }
+});
+
+router.get("/my-document/list", middleware, async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    // Fetch the user along with purchasedDocs (DocumentModel)
+    const user = await userModel.findById(userId).populate("purchasedDocs");
+
+    if (!user || !user.purchasedDocs?.length) {
+      return res.status(200).json([]);
+    }
+
+    // Generate presigned URLs for thumbnails
+    const docsWithThumbnails = await Promise.all(
+      user.purchasedDocs.map(async (doc) => {
+        const docObj = doc.toObject();
+
+        if (doc.thumbnailKey) {
+          const thumbnailUrl = s3.getSignedUrl("getObject", {
+            Bucket: process.env.S3_BUCKET,
+            Key: doc.thumbnailKey,
+            Expires: 60 * 60, // 1 hour
+          });
+          docObj.thumbnailBase64 = thumbnailUrl; // store URL for frontend
+        } else {
+          docObj.thumbnailBase64 = null;
+        }
+
+        return docObj;
+      })
+    );
+
+   
+    res.json(docsWithThumbnails);
+  } catch (err) {
+    console.error("❌ Error fetching purchased documents:", err);
+    res.status(500).json({ message: "Failed to fetch purchased documents" });
   }
 });
 
