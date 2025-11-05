@@ -24,7 +24,7 @@ const BottomNavBar = () => {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   const navItems = [
-    { label: "Shop", icon: Store, path: "/" },
+    { label: "Shop", icon: Store, path: "/shop" },
     { label: "Wishlist", icon: Heart, path: "/wishlist", count: user?.wishlist?.length || 0},
     { label: "Cart", icon: ShoppingCart, path: "/cart",  count: user?.cart?.length || 0 },
     { label: "Search", icon: Search, path: "/search" },

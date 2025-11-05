@@ -22,6 +22,8 @@ import MyDocument from './Pages/MyDocument';
 import DocDetail from './Pages/DocumentDetail';
 import CartPage from './Pages/CartPage';
 import CheckoutPage from './Pages/CheckoutPage';
+import Shop from "./Pages/Shop";
+
 function App() {
 
    const [showLoginModal, setShowLoginModal] = useState(false);
@@ -149,6 +151,8 @@ function App() {
          
       
         </Route>
+        <Route path="/shop" element={<Shop />} />
+
     </Routes>
     </>
     
