@@ -93,6 +93,12 @@ export default function Sidebar({ active, onNavigate }) {
             label="Upload Document"
             
           />
+          <NavItem
+          to="/admin/add-banner"
+            icon={DocumentsIcon}
+            label="Add Banner"
+            
+          />
         </nav>
       </div>
 

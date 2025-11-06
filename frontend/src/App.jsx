@@ -23,6 +23,7 @@ import DocDetail from './Pages/DocumentDetail';
 import CartPage from './Pages/CartPage';
 import CheckoutPage from './Pages/CheckoutPage';
 import Shop from "./Pages/Shop";
+import FillBanner from './Pages/FillBanner';
 
 function App() {
 
@@ -148,6 +149,8 @@ function App() {
           <Route path="alldocuments" element={   <AdminRoute openLoginModal={() => setShowLoginModal(true)}><AllDocument  /></AdminRoute>} />
           <Route path="upload-document" element={
                <AdminRoute openLoginModal={() => setShowLoginModal(true)}><UploadDocument  /></AdminRoute>} />
+          <Route path="add-banner" element={
+               <AdminRoute openLoginModal={() => setShowLoginModal(true)}><FillBanner  /></AdminRoute>} />
          
       
         </Route>

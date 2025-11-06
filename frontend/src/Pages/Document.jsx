@@ -34,12 +34,49 @@ export default function Documents() {
   // Generate random rating between 3.5 and 5.0 (1 decimal)
   const getRandomRating = () => (Math.random() * (5 - 4) + 4).toFixed(1);
   const getRandomCount = () => Math.floor(Math.random() * 200) + 20; // between 20–220
-  const banners = [banner1, banner2, banner3, banner4];
+  const banners = [banner1];
 
   const [selectedCategory, setSelectedCategory] = useState("All");
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
+  const [topBanners, setTopBanners] = useState([]);
+  const [bottomBanners, setBottomBanners] = useState([]);
+  const [currentTop, setCurrentTop] = useState(0);
+  const [currentBottom, setCurrentBottom] = useState(0);
+
+
+  useEffect(() => {
+    const fetchBanners = async () => {
+      try {
+        const res = await api.get("/api/v1/banner/getimages");
+        // Separate by banner type
+        const banner1Images = res.data.filter((img) => img.bannerType === "banner1");
+        const banner2Images = res.data.filter((img) => img.bannerType === "banner2");
+
+        setTopBanners(banner1Images);
+        setBottomBanners(banner2Images);
+      } catch (err) {
+        console.error("Error fetching banners:", err);
+      }
+    };
+    fetchBanners();
+  }, []);
+   useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTop((prev) => (topBanners.length > 0 ? (prev + 1) % topBanners.length : 0));
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [topBanners]);
+
+  // Auto-rotate bottom banners
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentBottom((prev) => (bottomBanners.length > 0 ? (prev + 1) % bottomBanners.length : 0));
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [bottomBanners]);
+
 
   useEffect(() => {
     loadDocs();
@@ -57,12 +94,6 @@ export default function Documents() {
   }
 
   const [categories, setCategories] = useState([]);
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % banners.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
 
   async function loadPurchased() {
     try {
@@ -220,30 +251,35 @@ export default function Documents() {
 
       {/* Banner carousel */}
       <div className="relative w-full overflow-hidden mb-10">
-        <motion.div
-          key={current}
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -50 }}
-          transition={{ duration: 0.6 }}
-        >
-          <img
-            src={banners[current]}
-            alt={`Banner ${current + 1}`}
-            className="w-full h-52 sm:h-64 md:h-96 object-cover  shadow-md"
-          />
-        </motion.div>
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
-          {banners.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrent(i)}
-              className={`w-2.5 h-2.5 rounded-full transition-all ${
-                current === i ? "bg-white" : "bg-gray-400"
-              }`}
+         {topBanners.length > 0 && (
+        <div className="relative w-full overflow-hidden mb-10">
+          <motion.div
+            key={currentTop}
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -50 }}
+            transition={{ duration: 0.6 }}
+          >
+            <img
+              src={topBanners[currentTop].url}
+              alt={`Top Banner ${currentTop + 1}`}
+             className="w-full shadow-md h-60 md:h-128 object-fill"
             />
-          ))}
+          </motion.div>
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
+            {topBanners.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrentTop(i)}
+                className={`w-2.5 h-2.5 rounded-full transition-all ${
+                  currentTop === i ? "bg-white" : "bg-gray-400"
+                }`}
+              />
+            ))}
+          </div>
         </div>
+      )}
+
       </div>
 
       <div className="text-center mb-5 sm:mb-12">
@@ -416,32 +452,37 @@ export default function Documents() {
           </button>
         </div>
       )}
-      <div className="relative w-full overflow-hidden mb-10">
-        <motion.div
-          key={current}
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -50 }}
-          transition={{ duration: 0.6 }}
-        >
-          <img
-            src={banners[current]}
-            alt={`Banner ${current + 1}`}
-            className="w-full h-60 sm:h-64 md:h-96 object-cover  shadow-md"
-          />
-        </motion.div>
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
-          {banners.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrent(i)}
-              className={`w-2.5 h-2.5 rounded-full transition-all ${
-                current === i ? "bg-white" : "bg-gray-400"
-              }`}
+     <div className="relative w-full overflow-hidden mb-10">
+        {bottomBanners.length > 0 && (
+        <div className="relative w-full overflow-hidden mt-10">
+          <motion.div
+            key={currentBottom}
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -50 }}
+            transition={{ duration: 0.6 }}
+          >
+            <img
+              src={bottomBanners[currentBottom].url}
+              alt={`Bottom Banner ${currentBottom + 1}`}
+              className="w-full object-cover shadow-md"
             />
-          ))}
+          </motion.div>
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
+            {bottomBanners.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrentBottom(i)}
+                className={`w-2.5 h-2.5 rounded-full transition-all ${
+                  currentBottom === i ? "bg-white" : "bg-gray-400"
+                }`}
+              />
+            ))}
+          </div>
         </div>
+      )}
       </div>
+
     </div>
   );
 }

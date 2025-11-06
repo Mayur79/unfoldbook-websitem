@@ -1,5 +1,5 @@
 import React from "react";
-import "boxicons/css/boxicons.min.css";
+// import "boxicons/css/boxicons.min.css";
 import { motion } from "framer-motion";
 
 export default function CategorySelection({

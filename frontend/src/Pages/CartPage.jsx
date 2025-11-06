@@ -124,7 +124,7 @@ export default function CartPage() {
                       transition={{ delay: index * 0.05 }}
                       className="bg-white rounded-2xl p-5 sm:p-6 border border-blue-100 hover:border-blue-300 hover:shadow-md transition-all group"
                     >
-                      <div className="flex items-start gap-4">
+                  <div className="flex flex-wrap sm:flex-nowrap items-start gap-4">
                         <div className="flex-shrink-0">
                           <div className="relative w-24 h-32  rounded-xl overflow-hidden flex items-center justify-center ">
                             <img
