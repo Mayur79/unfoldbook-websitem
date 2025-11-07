@@ -3,22 +3,23 @@ import React, { useEffect, useState } from "react";
 import { Filter } from "lucide-react";
 import api from "../services/api";
 
-// Avatar component (same style as RolePage)
+// Avatar component (blue gradient theme)
 function Avatar({ name }) {
-  const initials = name
-    .split(" ")
-    .map((n) => n[0])
-    .slice(0, 2)
-    .join("");
+  const initials =
+    name
+      ?.split(" ")
+      .map((n) => n[0])
+      .slice(0, 2)
+      .join("") || "?";
   return (
-    <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-emerald-500 to-emerald-300 text-white flex items-center justify-center text-sm font-semibold shadow-sm">
+    <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-500 to-blue-300 text-white flex items-center justify-center text-sm font-semibold shadow-sm">
       {initials}
     </div>
   );
 }
 
 export default function Customer() {
-   const [customers, setCustomers] = useState([]);
+  const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -35,25 +36,23 @@ export default function Customer() {
     fetchCustomers();
   }, []);
 
-
   if (loading) {
     return (
       <div className="text-center py-10 text-gray-500">Loading customers...</div>
     );
   }
 
-
   return (
-    <div className="bg-white/70 backdrop-blur-md border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow duration-300">
+    <div className="bg-white/70 backdrop-blur-md border border-blue-100 rounded-2xl p-6 shadow-sm">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between mb-6">
         <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
           Customer List
-          <span className="ml-1 text-xs text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full font-medium">
+          <span className="ml-1 text-xs text-blue-700 bg-blue-100 px-2 py-0.5 rounded-full font-medium">
             Active
           </span>
         </h2>
-        <button className="flex items-center gap-2 px-3 py-2 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+        <button className="flex items-center gap-2 px-3 py-2 text-sm border border-blue-100 rounded-lg bg-blue-50 text-blue-600">
           <Filter size={16} />
           Filter
         </button>
@@ -75,7 +74,7 @@ export default function Customer() {
             {customers.map((c, idx) => (
               <tr
                 key={idx}
-                className="bg-white hover:bg-gray-50 transition-all duration-200 shadow-sm rounded-xl"
+                className="bg-white shadow-sm rounded-xl border border-blue-50"
               >
                 {/* Customer Info */}
                 <td className="py-4 px-4 rounded-l-xl">
@@ -84,7 +83,7 @@ export default function Customer() {
                     <div>
                       <div className="font-medium text-gray-900">{c.name}</div>
                       <div className="text-xs text-gray-400">
-                     Joined {new Date(c.createdAt).toLocaleDateString()} • Active
+                        Joined {new Date(c.createdAt).toLocaleDateString()} • Active
                       </div>
                     </div>
                   </div>
@@ -94,12 +93,14 @@ export default function Customer() {
                 <td className="py-4 px-4 text-gray-700">{c.email}</td>
 
                 {/* Password */}
-                <td className="py-4 px-4 text-gray-700">{c.password|| "*****"}</td>
+                <td className="py-4 px-4 text-gray-700">
+                  {c.password || "*****"}
+                </td>
 
                 {/* Documents */}
                 <td className="py-4 px-4 rounded-r-xl">
-                  <span className="px-3 py-1 text-xs font-medium bg-emerald-50 text-emerald-700 rounded-full">
-                     {c.documents} Docs
+                  <span className="px-3 py-1 text-xs font-medium bg-blue-50 text-blue-700 rounded-full">
+                    {c.documents} Docs
                   </span>
                 </td>
               </tr>

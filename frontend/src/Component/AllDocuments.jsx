@@ -1,8 +1,8 @@
 // src/Pages/AllDocuments.jsx
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { List, Grid, Folder, FileText, ArrowLeft } from "lucide-react";
 import api from "../services/api";
-import { Toaster, toast } from 'sonner';
+import { Toaster, toast } from "sonner";
 
 export default function AllDocuments() {
   const [view, setView] = useState("grid");
@@ -10,6 +10,7 @@ export default function AllDocuments() {
   const [files, setFiles] = useState([]);
   const [currentFolder, setCurrentFolder] = useState(null);
   const [loading, setLoading] = useState(false);
+
   // === Folder and File Data ===
   useEffect(() => {
     fetchCategories();
@@ -30,9 +31,7 @@ export default function AllDocuments() {
   const fetchDocuments = async (category) => {
     try {
       setLoading(true);
-      const res = await api.get(
-        `/api/v1/doc/documents/${category._id}`
-      );
+      const res = await api.get(`/api/v1/doc/documents/${category._id}`);
       setFiles(res.data);
       setCurrentFolder(category);
     } catch (error) {
@@ -42,35 +41,34 @@ export default function AllDocuments() {
     }
   };
 
- const handleDelete = async (item, type) => {
-  const name = type === "folder" ? item.categoryName : item.title;
-  if (!window.confirm(`Delete ${type} "${name}"?`)) return;
+  const handleDelete = async (item, type) => {
+    const name = type === "folder" ? item.categoryName : item.title;
+    if (!window.confirm(`Delete ${type} "${name}"?`)) return;
 
-  try {
-    setLoading(true);
-    toast.loading(`Deleting ${type}...`, { id: "delete" });
+    try {
+      setLoading(true);
+      toast.loading(`Deleting ${type}...`, { id: "delete" });
 
-    // unified delete route
-    await api.delete(`/api/v1/doc/delete/${type}/${item._id}`);
+      await api.delete(`/api/v1/doc/delete/${type}/${item._id}`);
 
-    if (type === "folder") {
-      fetchCategories(); // reload category list
-      toast.success(`Folder "${name}" and its files deleted`, { id: "delete" });
-    } else {
-      fetchDocuments(currentFolder);
-      toast.success(`File "${name}" deleted`, { id: "delete" });
+      if (type === "folder") {
+        fetchCategories();
+        toast.success(`Folder "${name}" deleted`, { id: "delete" });
+      } else {
+        fetchDocuments(currentFolder);
+        toast.success(`File "${name}" deleted`, { id: "delete" });
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error(`Failed to delete ${type}`, { id: "delete" });
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error(error);
-    toast.error(`Failed to delete ${type}`, { id: "delete" });
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   return (
-     <div className="p-4">
-      <Toaster/>
+    <div className="p-4">
+      <Toaster />
       {/* ===== Header ===== */}
       <div className="flex justify-between items-center mb-5">
         <div className="flex items-center gap-3">
@@ -80,7 +78,7 @@ export default function AllDocuments() {
                 setCurrentFolder(null);
                 setFiles([]);
               }}
-              className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition"
+              className="p-2 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 transition"
             >
               <ArrowLeft size={18} />
             </button>
@@ -92,7 +90,7 @@ export default function AllDocuments() {
 
         <button
           onClick={() => setView(view === "grid" ? "list" : "grid")}
-          className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
+          className="p-2 bg-blue-50 rounded-lg hover:bg-blue-100 text-blue-600 transition"
         >
           {view === "grid" ? <List size={18} /> : <Grid size={18} />}
         </button>
@@ -108,10 +106,10 @@ export default function AllDocuments() {
               files.map((file) => (
                 <div
                   key={file._id}
-                  className="p-4 border border-gray-200 rounded-lg bg-white shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-between"
+                  className="p-4 border border-blue-100 rounded-xl bg-white shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-between hover:-translate-y-1"
                 >
                   <div className="flex justify-between items-start w-full">
-                    <FileText className="text-emerald-600" size={24} />
+                    <FileText className="text-blue-600" size={24} />
                     <i
                       className="bx bx-trash text-red-500 text-xl hover:text-red-600 transition cursor-pointer"
                       onClick={(e) => {
@@ -134,10 +132,10 @@ export default function AllDocuments() {
                 <div
                   key={category._id}
                   onClick={() => fetchDocuments(category)}
-                  className="p-4 border border-gray-200 rounded-lg bg-white shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-between"
+                  className="p-4 border border-blue-100 rounded-xl bg-white shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-between hover:-translate-y-1"
                 >
                   <div className="flex justify-between items-start w-full">
-                    <Folder className="text-emerald-600" size={24} />
+                    <Folder className="text-blue-600" size={24} />
                     <i
                       className="bx bx-trash text-red-500 text-xl hover:text-red-600 transition cursor-pointer"
                       onClick={(e) => {
@@ -154,8 +152,8 @@ export default function AllDocuments() {
         </div>
       ) : (
         // ===== List View =====
-        <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-sm">
-          <thead className="bg-gray-100">
+        <table className="min-w-full bg-white border border-blue-100 rounded-lg shadow-sm">
+          <thead className="bg-blue-50">
             <tr>
               <th className="px-4 py-2 text-left text-sm text-gray-600">
                 {currentFolder ? "File Name" : "Category Name"}
@@ -173,10 +171,10 @@ export default function AllDocuments() {
               ? files.map((file) => (
                   <tr
                     key={file._id}
-                    className="border-t border-gray-100 hover:bg-gray-50 cursor-pointer"
+                    className="border-t border-blue-50 hover:bg-blue-50 cursor-pointer"
                   >
                     <td className="px-4 py-2 flex items-center gap-2 text-gray-800">
-                      <FileText className="text-emerald-600" size={16} />
+                      <FileText className="text-blue-600" size={16} />
                       {file.title}
                     </td>
                     <td className="px-4 py-2 text-gray-600">{file.type}</td>
@@ -195,10 +193,10 @@ export default function AllDocuments() {
                   <tr
                     key={cat._id}
                     onClick={() => fetchDocuments(cat)}
-                    className="border-t border-gray-100 hover:bg-gray-50 cursor-pointer"
+                    className="border-t border-blue-50 hover:bg-blue-50 cursor-pointer"
                   >
                     <td className="px-4 py-2 flex items-center gap-2 text-gray-800">
-                      <Folder className="text-emerald-600" size={16} />
+                      <Folder className="text-blue-600" size={16} />
                       {cat.categoryName}
                     </td>
                     <td className="px-4 py-2 text-gray-600">
