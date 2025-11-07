@@ -3,14 +3,14 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 
 // Individual Navigation Item
-const NavItem = ({to, icon, label }) => (
-   <NavLink
+const NavItem = ({ to, icon, label }) => (
+  <NavLink
     to={to}
     className={({ isActive }) =>
       `flex items-center gap-3 w-full text-left px-3 py-2.5 rounded-xl transition-all duration-150 ${
         isActive
-          ? "bg-emerald-50 text-emerald-700 font-semibold shadow-sm"
-          : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+          ? "bg-blue-50 text-blue-700 font-semibold shadow-sm border border-blue-100"
+          : "text-gray-600 hover:bg-blue-50 hover:text-blue-700 hover:shadow-sm"
       }`
     }
   >
@@ -56,43 +56,18 @@ export default function Sidebar({ active, onNavigate }) {
   );
 
   return (
-    <aside className="w-60 bg-white border-r border-gray-100 h-screen sticky top-0 shadow-[0_0_10px_rgba(0,0,0,0.03)] flex flex-col justify-between">
-      {/* Top section */}
+    <aside className="w-60 bg-white border-r border-blue-100 h-screen sticky top-0 shadow-[0_0_10px_rgba(0,0,255,0.05)] flex flex-col justify-between">
+      {/* Top Section */}
       <div className="p-4">
-       
+        
 
         {/* Navigation */}
         <nav className="space-y-1">
-          <NavItem
-           to="/admin/dashboard"
-            icon={DashboardIcon}
-            label="Dashboard"
-           
-          />
-          <NavItem
-          to="/admin/roles"
-            icon={RolesIcon}
-            label="Roles"
-           
-          />
-          <NavItem
-          to="/admin/customers" 
-            icon={CustomersIcon}
-            label="Customers"
-            
-          />
-          <NavItem
-          to="/admin/alldocuments"
-            icon={DocumentsIcon}
-            label="All Documents"
-            
-          />
-          <NavItem
-          to="/admin/upload-document"
-            icon={DocumentsIcon}
-            label="Upload Document"
-            
-          />
+          <NavItem to="/admin/dashboard" icon={DashboardIcon} label="Dashboard" />
+          <NavItem to="/admin/roles" icon={RolesIcon} label="Roles" />
+          <NavItem to="/admin/customers" icon={CustomersIcon} label="Customers" />
+          <NavItem to="/admin/alldocuments" icon={DocumentsIcon} label="All Documents" />
+          <NavItem to="/admin/upload-document" icon={DocumentsIcon} label="Upload Document" />
           <NavItem
           to="/admin/add-banner"
             icon={DocumentsIcon}
@@ -103,14 +78,14 @@ export default function Sidebar({ active, onNavigate }) {
       </div>
 
       {/* Bottom Section */}
-      <div className="p-4 border-t border-gray-100">
-        <p className="text-xs text-gray-400 uppercase tracking-wide mb-1 px-2">
+      <div className="p-4 border-t border-blue-50">
+        <p className="text-xs text-blue-400 uppercase tracking-wide mb-1 px-2">
           Support
         </p>
-        <button className="w-full text-left px-3 py-2 rounded-lg text-gray-600 text-sm hover:bg-gray-50 hover:text-gray-900 transition">
+        <button className="w-full text-left px-3 py-2 rounded-lg text-gray-600 text-sm hover:bg-blue-50 hover:text-blue-700 transition">
           Settings
         </button>
-        <button className="w-full text-left px-3 py-2 rounded-lg text-gray-600 text-sm hover:bg-gray-50 hover:text-gray-900 transition">
+        <button className="w-full text-left px-3 py-2 rounded-lg text-gray-600 text-sm hover:bg-blue-50 hover:text-blue-700 transition">
           Feedback
         </button>
       </div>

@@ -1,8 +1,9 @@
+// src/Pages/RolePage.jsx
 import React, { useEffect, useState } from "react";
 import { Filter, ChevronDown } from "lucide-react";
-import axios from "axios";
 import api from "../services/api";
-import {toast} from "sonner"
+import { toast } from "sonner";
+
 function Avatar({ name }) {
   const initials = name
     ? name
@@ -12,7 +13,7 @@ function Avatar({ name }) {
         .join("")
     : "?";
   return (
-    <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-emerald-500 to-emerald-300 text-white flex items-center justify-center text-sm font-semibold shadow-sm">
+    <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-500 to-blue-300 text-white flex items-center justify-center text-sm font-semibold shadow-sm">
       {initials}
     </div>
   );
@@ -23,15 +24,13 @@ export default function RolePage() {
   const [roles, setRoles] = useState({});
   const [loading, setLoading] = useState(true);
 
-  // Fetch all users
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         const res = await api.get("/api/users");
         const userList = res.data;
-
         setPeople(userList);
-        // Initialize roles state with existing user roles
+
         const roleMap = {};
         userList.forEach((u) => {
           roleMap[u._id] = u.role || "User";
@@ -47,21 +46,15 @@ export default function RolePage() {
     fetchUsers();
   }, []);
 
-  // Handle role change
   const handleRoleChange = async (userId, newRole) => {
     try {
-      // Update immediately in UI
       setRoles((prev) => ({ ...prev, [userId]: newRole }));
-
-      // Send update to backend
       await api.put(`/api/users/update-role/${userId}/role`, {
         role: newRole,
       });
-
-  
       toast.success("Role updated successfully");
     } catch (err) {
-      toast.error("Error updating the role")
+      toast.error("Error updating the role");
       console.error("Error updating role:", err);
     }
   };
@@ -75,16 +68,16 @@ export default function RolePage() {
   }
 
   return (
-    <div className="bg-white/70 backdrop-blur-md border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow duration-300">
+    <div className="bg-white/70 backdrop-blur-md border border-blue-100 rounded-2xl p-6 shadow-sm">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between mb-6">
         <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
           Your Customers
-          <span className="ml-1 text-xs text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full font-medium">
+          <span className="ml-1 text-xs text-blue-700 bg-blue-100 px-2 py-0.5 rounded-full font-medium">
             Live
           </span>
         </h2>
-        <button className="flex items-center gap-2 px-3 py-2 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+        <button className="flex items-center gap-2 px-3 py-2 text-sm border border-blue-100 rounded-lg bg-blue-50 text-blue-600">
           <Filter size={16} />
           Filter
         </button>
@@ -102,10 +95,7 @@ export default function RolePage() {
 
           <tbody className="text-sm text-gray-700">
             {people.map((p, idx) => (
-              <tr
-                key={idx}
-                className="bg-white hover:bg-gray-50 transition-all duration-200 shadow-sm rounded-xl"
-              >
+              <tr key={idx} className="bg-white shadow-sm rounded-xl border border-blue-50">
                 {/* Customer Info */}
                 <td className="py-4 px-4 rounded-l-xl">
                   <div className="flex items-center gap-3">
@@ -122,10 +112,8 @@ export default function RolePage() {
                   <div className="relative inline-block text-left w-36">
                     <select
                       value={roles[p._id] || "User"}
-                      onChange={(e) =>
-                        handleRoleChange(p._id, e.target.value)
-                      }
-                      className="w-full appearance-none text-xs font-medium bg-gray-50 border border-gray-200 text-gray-700 rounded-lg px-3 py-2 pr-6 cursor-pointer hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition"
+                      onChange={(e) => handleRoleChange(p._id, e.target.value)}
+                      className="w-full appearance-none text-xs font-medium bg-blue-50 border border-blue-100 text-blue-700 rounded-lg px-3 py-2 pr-6 cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-400"
                     >
                       {roleOptions.map((role) => (
                         <option key={role} value={role}>
@@ -135,7 +123,7 @@ export default function RolePage() {
                     </select>
                     <ChevronDown
                       size={14}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-blue-500 pointer-events-none"
                     />
                   </div>
                 </td>

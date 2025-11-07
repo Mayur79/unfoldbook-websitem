@@ -5,15 +5,18 @@ import LoginModal from "../Pages/Login";
 import SignupModal from "../Pages/SignupModal";
 import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
+
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const { user, logout } = useAuth();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isSignupOpen, setIsSignupOpen] = useState(false);
-const navigate = useNavigate();
+  const navigate = useNavigate();
+
   return (
     <>
+      {/* Modals */}
       <LoginModal
         isOpen={showLoginModal}
         onClose={() => setShowLoginModal(false)}
@@ -25,12 +28,12 @@ const navigate = useNavigate();
         onOpenLogin={() => setShowLoginModal(true)}
       />
 
-      <nav className="sticky top-0 z-50 bg-blue-100 backdrop-blur-md border-b border-gray-100 shadow-sm font-poppins">
+      {/* Navbar */}
+      <nav className="sticky top-0 z-50 bg-white/70 backdrop-blur-lg border-b border-blue-100 shadow-sm font-poppins transition-all duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
           {/* Logo */}
-          <a href="/" className="flex items-center gap-2 border-0">
-         
-            <img src={logo} alt=""  className="h-8" />
+          <a href="/" className="flex items-center gap-2">
+            <img src={logo} alt="Logo" className="h-8" />
           </a>
 
           {/* Desktop Menu */}
@@ -38,7 +41,7 @@ const navigate = useNavigate();
             <li>
               <a
                 href="/"
-                className="text-gray-700 hover:text-emerald-600 transition-colors duration-200"
+                className="text-gray-700 hover:text-blue-600 transition-colors duration-200"
               >
                 Home
               </a>
@@ -46,7 +49,7 @@ const navigate = useNavigate();
             <li>
               <a
                 href="#"
-                className="text-gray-700 hover:text-emerald-600 transition-colors duration-200"
+                className="text-gray-700 hover:text-blue-600 transition-colors duration-200"
               >
                 About
               </a>
@@ -54,17 +57,16 @@ const navigate = useNavigate();
             <li>
               <a
                 href="#"
-                className="text-gray-700 hover:text-emerald-600 transition-colors duration-200"
+                className="text-gray-700 hover:text-blue-600 transition-colors duration-200"
               >
                 Services
               </a>
             </li>
-
             {user && (
               <li>
                 <a
                   href="/my-document"
-                  className="text-gray-700 hover:text-emerald-600 transition-colors duration-200"
+                  className="text-gray-700 hover:text-blue-600 transition-colors duration-200"
                 >
                   My Document
                 </a>
@@ -72,42 +74,36 @@ const navigate = useNavigate();
             )}
           </ul>
 
-          {/* User + Icons + Mobile Menu */}
+          {/* Icons & User Menu */}
           <div className="flex items-center gap-4">
-            {/* Search Icon */}
+            {/* Search */}
             <button
               onClick={() => console.log("Search clicked")}
-              className="p-2 rounded-full hover:bg-gray-100 transition"
+              className="p-2 rounded-full hover:bg-blue-50 transition"
               aria-label="Search"
             >
               <Search size={20} className="text-gray-600" />
             </button>
 
-            {/* Cart Icon */}
+            {/* Cart */}
             <button
-              onClick={() =>navigate("/cart")}
-              className="relative p-2 rounded-full hover:bg-gray-100 transition"
+              onClick={() => navigate("/cart")}
+              className="relative p-2 rounded-full hover:bg-blue-50 transition"
               aria-label="Cart"
             >
               <ShoppingCart size={20} className="text-gray-600" />
-              {/* Optional cart badge */}
-              {user?.cart?.length > 0 ?( <span className="absolute top-1 right-1 bg-emerald-500 text-white text-[10px] font-semibold rounded-full w-4 h-4 flex items-center justify-center">
-                {user?.cart?.length}
-              </span>):(
-                 <span className="absolute top-1 right-1 bg-emerald-500 text-white text-[10px] font-semibold rounded-full w-4 h-4 flex items-center justify-center">
-                0
+              <span className="absolute top-1 right-1 bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-[10px] font-semibold rounded-full w-4 h-4 flex items-center justify-center">
+                {user?.cart?.length || 0}
               </span>
-              )}
-             
             </button>
 
-            {/* User Menu / Login */}
+            {/* User Menu */}
             {user ? (
-              <div className="">
+              <div className="relative">
                 <button
                   type="button"
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                  className="hidden md:flex items-center justify-center w-9 h-9 rounded-full bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition"
+                  className="hidden md:flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-semibold shadow-sm hover:shadow-md transition-all duration-300"
                 >
                   {user?.name?.charAt(0).toUpperCase() ||
                     user?.email?.charAt(0).toUpperCase() ||
@@ -115,8 +111,8 @@ const navigate = useNavigate();
                 </button>
 
                 {isUserMenuOpen && (
-                  <div className="absolute right-0 mt-3 w-48 rounded-lg bg-white shadow-lg border border-gray-100 overflow-hidden">
-                    <div className="px-4 py-3 border-b border-gray-100">
+                  <div className="absolute right-0 mt-3 w-52 rounded-xl bg-white shadow-lg border border-blue-100 overflow-hidden animate-fadeIn">
+                    <div className="px-4 py-3 border-b border-blue-50">
                       <p className="text-sm font-medium text-gray-900">
                         {user?.name || "User"}
                       </p>
@@ -129,7 +125,7 @@ const navigate = useNavigate();
                         <li>
                           <a
                             href="/admin"
-                            className="block px-4 py-2 hover:bg-gray-50"
+                            className="block px-4 py-2 hover:bg-blue-50 hover:text-blue-600 transition"
                           >
                             Admin Dashboard
                           </a>
@@ -138,7 +134,7 @@ const navigate = useNavigate();
                       <li>
                         <button
                           onClick={logout}
-                          className="w-full text-left px-4 py-2 hover:bg-gray-50"
+                          className="w-full text-left px-4 py-2 hover:bg-blue-50 hover:text-blue-600 transition"
                         >
                           Sign out
                         </button>
@@ -150,7 +146,7 @@ const navigate = useNavigate();
             ) : (
               <button
                 onClick={() => setShowLoginModal(true)}
-                className="text-sm font-medium text-gray-700 hover:text-emerald-600 transition hidden md:block"
+                className="text-sm font-medium text-gray-700 hover:text-blue-600 transition hidden md:block"
               >
                 Login
               </button>
@@ -159,7 +155,7 @@ const navigate = useNavigate();
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden p-2 rounded-md text-gray-600 hover:bg-gray-100 transition"
+              className="md:hidden p-2 rounded-md text-gray-600 hover:bg-blue-50 transition"
             >
               {isMenuOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
@@ -168,27 +164,25 @@ const navigate = useNavigate();
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden border-t border-gray-100 bg-white shadow-sm">
+          <div className="md:hidden border-t border-blue-100 bg-white shadow-sm animate-slideDown">
             <ul className="flex flex-col p-4 space-y-2">
-              {
-                user?null:(
-   <li>
-                <button
-                onClick={() =>{ setShowLoginModal(true);
-                  setIsMenuOpen(false);
-                }}
-                  className="block py-2 px-3 rounded-md text-gray-700 hover:bg-gray-100 hover:text-emerald-600 transition"
-                >
-                 Login
-                </button>
-              </li>
-                )
-              }
-            
+              {!user && (
+                <li>
+                  <button
+                    onClick={() => {
+                      setShowLoginModal(true);
+                      setIsMenuOpen(false);
+                    }}
+                    className="block py-2 px-3 rounded-md text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"
+                  >
+                    Login
+                  </button>
+                </li>
+              )}
               <li>
                 <a
                   href="/"
-                  className="block py-2 px-3 rounded-md text-gray-700 hover:bg-gray-100 hover:text-emerald-600 transition"
+                  className="block py-2 px-3 rounded-md text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"
                 >
                   Home
                 </a>
@@ -196,7 +190,7 @@ const navigate = useNavigate();
               <li>
                 <a
                   href="#"
-                  className="block py-2 px-3 rounded-md text-gray-700 hover:bg-gray-100 hover:text-emerald-600 transition"
+                  className="block py-2 px-3 rounded-md text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"
                 >
                   About
                 </a>
@@ -204,17 +198,16 @@ const navigate = useNavigate();
               <li>
                 <a
                   href="#"
-                  className="block py-2 px-3 rounded-md text-gray-700 hover:bg-gray-100 hover:text-emerald-600 transition"
+                  className="block py-2 px-3 rounded-md text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"
                 >
                   Services
                 </a>
               </li>
-             
               {user && (
                 <li>
                   <a
                     href="/my-document"
-                    className="block py-2 px-3 rounded-md text-gray-700 hover:bg-gray-100 hover:text-emerald-600 transition"
+                    className="block py-2 px-3 rounded-md text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"
                   >
                     My Document
                   </a>
