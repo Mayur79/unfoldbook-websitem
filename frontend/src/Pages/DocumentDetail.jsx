@@ -15,6 +15,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
+import { toast } from "sonner";
 
 export default function DocDetail() {
   const { id } = useParams();
@@ -53,28 +54,111 @@ export default function DocDetail() {
   return (
     <div className="md:max-w-6xl sm:mx-auto mt-6 sm:mt-10 p-4 sm:p-6 bg-white rounded-xl shadow-lg font-poppins relative">
       {/* 🖼️ Fullscreen Modal */}
-      {isFullscreen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50"
-          onClick={() => setIsFullscreen(false)}
-        >
-          <button
-            className="absolute top-5 right-5 text-white hover:text-gray-300"
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsFullscreen(false);
-            }}
-          >
-            <X size={28} />
-          </button>
+   {isFullscreen && (
+  <div
+    className="fixed inset-0 bg-gray-100 bg-opacity-90 flex flex-col items-center justify-center z-50"
+    onClick={() => setIsFullscreen(false)}
+  >
+    <button
+      className="absolute top-5 right-5 text-black hover:text-gray-300 z-50"
+      onClick={(e) => {
+        e.stopPropagation();
+        setIsFullscreen(false);
+      }}
+    >
+      <X size={28} />
+    </button>
 
-          <img
-            src={selectedImage}
-            alt="Fullscreen view"
-            className="max-w-[90%] max-h-[90%] object-contain rounded-lg shadow-lg"
-          />
-        </div>
-      )}
+    {/* ✅ Use separate ref for fullscreen swiper */}
+    <div
+      className="relative w-full max-w-5xl"
+      onClick={(e) => e.stopPropagation()}
+    >
+     {/* Fullscreen Swiper — use custom arrows only */}
+<Swiper
+  modules={[Navigation]}
+  spaceBetween={20}
+  slidesPerView={1}
+  loop={true}
+  navigation={false}         // ← disable built-in buttons
+  initialSlide={Math.max(0, galleryImages.indexOf(selectedImage))}
+  className="rounded-md"
+  onSwiper={(swiper) => { swiperRef.current = swiper; }}
+  onSlideChange={(swiper) => {
+    const current = galleryImages[swiper.realIndex % galleryImages.length];
+    setSelectedImage(current);
+  }}
+>
+  {galleryImages.map((url, i) => (
+    <SwiperSlide key={i}>
+      <img
+        src={url}
+        alt={`Fullscreen ${i}`}
+        className="w-full max-h-[85vh] object-contain rounded-lg"
+      />
+    </SwiperSlide>
+  ))}
+</Swiper>
+
+{/* custom chevrons (unchanged) */}
+<ChevronLeft
+  size={36}
+  className="absolute left-4 top-1/2 -translate-y-1/2 text-white bg-black/40 hover:bg-black/60 rounded-full p-2 cursor-pointer z-50"
+  onClick={(e) => { e.stopPropagation(); swiperRef.current?.slidePrev(); }}
+/>
+<ChevronRight
+  size={36}
+  className="absolute right-4 top-1/2 -translate-y-1/2 text-white bg-black/40 hover:bg-black/60 rounded-full p-2 cursor-pointer z-50"
+  onClick={(e) => { e.stopPropagation(); swiperRef.current?.slideNext(); }}
+/>
+
+
+      {/* ⬅️➡️ Custom arrows now control fullscreen swiper */}
+      <ChevronLeft
+        size={36}
+        className="absolute left-4 top-1/2 -translate-y-1/2 text-white bg-black/40 hover:bg-black/60 rounded-full p-2 cursor-pointer z-50"
+        onClick={(e) => {
+          e.stopPropagation();
+          swiperRef.current?.slidePrev();
+        }}
+      />
+      <ChevronRight
+        size={36}
+        className="absolute right-4 top-1/2 -translate-y-1/2 text-white bg-black/40 hover:bg-black/60 rounded-full p-2 cursor-pointer z-50"
+        onClick={(e) => {
+          e.stopPropagation();
+          swiperRef.current?.slideNext();
+        }}
+      />
+    </div>
+
+    {/* 📸 Thumbnails below fullscreen Swiper */}
+    <div
+      className="flex gap-3 mt-4 overflow-x-auto scrollbar-hide w-full max-w-5xl justify-center"
+      onClick={(e) => e.stopPropagation()}
+    >
+      {galleryImages.map((url, index) => (
+        <img
+          key={index}
+          src={url}
+          alt={`Thumb ${index + 1}`}
+          onClick={() => {
+            setSelectedImage(url);
+            swiperRef.current?.slideToLoop(index); // ✅ works now!
+          }}
+          className={`w-20 h-20 object-cover rounded-md border-2 cursor-pointer transition 
+            ${
+              selectedImage === url
+                ? "border-blue-500 scale-105"
+                : "border-gray-300 hover:border-blue-400"
+            }`}
+        />
+      ))}
+    </div>
+  </div>
+)}
+
+
 
       <div className="flex flex-col md:flex-row md:gap-10 md:items-start">
         {/* 🖼️ Image Section */}
@@ -231,6 +315,11 @@ export default function DocDetail() {
             <button
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-full text-sm sm:text-base shadow-md transition"
               onClick={(e) => {
+                if (!user) {
+      toast.info("Please login to buy documents.");
+      return;
+    }
+
                 e.stopPropagation();
 
                 if(user?.cart?.includes(doc._id)){

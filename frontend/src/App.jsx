@@ -79,11 +79,11 @@ function App() {
                 <Route
                   path="/doc/:id"
                   element={
-                    <PrivateRoute
-                      openLoginModal={() => setShowLoginModal(true)}
-                    >
+                    // <PrivateRoute
+                    //   openLoginModal={() => setShowLoginModal(true)}
+                    // >
                       <DocDetail />
-                    </PrivateRoute>
+                    // </PrivateRoute>
                   }
                 />
                 <Route
