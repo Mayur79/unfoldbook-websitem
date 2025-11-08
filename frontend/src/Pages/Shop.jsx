@@ -6,7 +6,7 @@ import api from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "sonner";
 import DocumentsCard from "../Component/DocumentsCart";
-import BottomNavBar from "../Component/BottomNavBar"; // ✅ import added
+import BottomNavBar from "../Component/BottomNavBar";
 
 export default function Shop() {
   const [docs, setDocs] = useState([]);
@@ -113,7 +113,7 @@ export default function Shop() {
       )}
 
       {/* ✅ Bottom Navigation Bar */}
-      <BottomNavBar />
+      <BottomNavBar/>
     </div>
   );
 }

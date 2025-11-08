@@ -8,7 +8,7 @@ export default function CategorySelection({
   selectedCategoryName,
 }) {
   return (
-    <div className="mb-12">
+    <div className="">
       {/* Horizontal Scroll Categories */}
       <div className="relative overflow-x-auto scrollbar-hide px-4 sm:px-8">
         <div
@@ -38,7 +38,7 @@ export default function CategorySelection({
       </div>
 
       {/* Category Heading Below */}
-      <div className="text-center mt-10">
+      <div className="text-center mt-5">
         <h3 className="text-2xl sm:text-3xl font-bold text-blue-600">
           {selectedCategoryName || "All Documents"}
         </h3>

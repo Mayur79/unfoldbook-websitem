@@ -134,7 +134,7 @@ export default function DocDetail() {
 
     {/* 📸 Thumbnails below fullscreen Swiper */}
     <div
-      className="flex gap-3 mt-4 overflow-x-auto scrollbar-hide w-full max-w-5xl justify-center"
+      className="flex gap-3 mt-4 overflow-x-auto scrollbar-hide w-full max-w-5xl justify-center p-2"
       onClick={(e) => e.stopPropagation()}
     >
       {galleryImages.map((url, index) => (
