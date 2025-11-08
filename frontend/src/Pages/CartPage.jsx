@@ -1,5 +1,4 @@
-
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { useAuth } from "../context/AuthContext"
 import api from "../services/api"
 import pdfimage from "../assets/pdfimage.png"
@@ -7,10 +6,12 @@ import { Trash2, CreditCard, ShoppingCart, ArrowRight } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { toast } from "sonner"
 import { useNavigate } from "react-router-dom"
+import MobileSearchBar from "../Component/MobileSearchBar" // ✅ import added
 
 export default function CartPage() {
   const { user, toggleCart } = useAuth()
   const [cartDocs, setCartDocs] = useState([])
+  const [searchQuery, setSearchQuery] = useState("") // ✅ search query state
   const [totalPrice, setTotalPrice] = useState(0)
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
@@ -26,6 +27,15 @@ export default function CartPage() {
 
     fetchCart()
   }, [user])
+
+  // ✅ Filter cart items based on search query
+  const filteredCart = useMemo(() => {
+    return cartDocs.filter(
+      (doc) =>
+        doc.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        doc._id?.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  }, [cartDocs, searchQuery])
 
   // 🧾 Razorpay payment handler
   const handlePayment = async () => {
@@ -52,7 +62,7 @@ export default function CartPage() {
             })
             toast.success("Payment Successful!")
             navigate("/purchased")
-          } catch (verifyErr) {
+          } catch {
             toast.error("Payment verification failed!")
           }
         },
@@ -80,42 +90,56 @@ export default function CartPage() {
     )
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-blue-50 font-poppins ">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-blue-50 font-poppins">
+      {/* ✅ Mobile Search Bar */}
+      <MobileSearchBar
+        placeholder="Search cart..."
+        onSearch={(query) => setSearchQuery(query)}
+      />
+
       <div className="max-w-6xl mx-auto p-4 sm:p-8">
-        <div className="mb-12">
+        <div className="mb-12 mt-4 sm:mt-0">
           <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 flex items-center gap-3 mb-2">
             <ShoppingCart className="w-10 h-10 text-blue-600" />
             Your Cart
           </h1>
           <div className="h-1 w-20 bg-gradient-to-r from-blue-600 to-blue-400 rounded-full"></div>
           <p className="text-gray-600 mt-3">
-            {cartDocs.length} {cartDocs.length === 1 ? "item" : "items"} in your cart
+            {filteredCart.length} {filteredCart.length === 1 ? "item" : "items"} in your cart
           </p>
         </div>
 
-        {cartDocs.length === 0 ? (
+        {filteredCart.length === 0 ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="bg-white rounded-3xl border border-blue-100 p-12 sm:p-16 text-center shadow-sm"
           >
             <ShoppingCart className="w-20 h-20 text-blue-200 mx-auto mb-6" />
-            <h2 className="text-2xl font-semibold text-gray-800 mb-2">Your cart is empty</h2>
-            <p className="text-gray-500 mb-8">Start adding documents to your cart to get started</p>
-            <button
-              onClick={() => navigate("/")}
-              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full font-semibold transition-all shadow-md hover:shadow-lg"
-            >
-              Continue Shopping
-              <ArrowRight size={18} />
-            </button>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-2">
+              {searchQuery ? "No results found" : "Your cart is empty"}
+            </h2>
+            <p className="text-gray-500 mb-8">
+              {searchQuery
+                ? "Try a different search term."
+                : "Start adding documents to your cart to get started"}
+            </p>
+            {!searchQuery && (
+              <button
+                onClick={() => navigate("/")}
+                className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full font-semibold transition-all shadow-md hover:shadow-lg"
+              >
+                Continue Shopping
+                <ArrowRight size={18} />
+              </button>
+            )}
           </motion.div>
         ) : (
           <div className="grid lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
               <div className="space-y-3">
                 <AnimatePresence>
-                  {cartDocs.map((doc, index) => (
+                  {filteredCart.map((doc, index) => (
                     <motion.div
                       key={doc._id}
                       initial={{ opacity: 0, y: 20 }}
@@ -124,9 +148,9 @@ export default function CartPage() {
                       transition={{ delay: index * 0.05 }}
                       className="bg-white rounded-2xl p-5 sm:p-6 border border-blue-100 hover:border-blue-300 hover:shadow-md transition-all group"
                     >
-                  <div className="flex flex-wrap sm:flex-nowrap items-start gap-4">
+                      <div className="flex flex-wrap sm:flex-nowrap items-start gap-4">
                         <div className="flex-shrink-0">
-                          <div className="relative w-24 h-32  rounded-xl overflow-hidden flex items-center justify-center ">
+                          <div className="relative w-24 h-32 rounded-xl overflow-hidden flex items-center justify-center">
                             <img
                               src={doc.thumbnailBase64 || pdfimage}
                               alt={doc.title}
@@ -139,10 +163,14 @@ export default function CartPage() {
                           <h2 className="font-semibold text-lg text-gray-900 truncate group-hover:text-blue-600 transition">
                             {doc.title}
                           </h2>
-                          <p className="text-sm text-gray-500 mt-2">Document ID: {doc._id.slice(-8)}</p>
+                          <p className="text-sm text-gray-500 mt-2">
+                            Document ID: {doc._id.slice(-8)}
+                          </p>
 
                           <div className="mt-4 flex items-baseline gap-2">
-                            <span className="text-2xl font-bold text-blue-600">₹{doc.finalPrice}</span>
+                            <span className="text-2xl font-bold text-blue-600">
+                              ₹{doc.finalPrice}
+                            </span>
                             <span className="text-sm text-gray-400">INR</span>
                           </div>
                         </div>
@@ -161,6 +189,7 @@ export default function CartPage() {
               </div>
             </div>
 
+            {/* 🧾 Order Summary */}
             <div className="lg:col-span-1">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -204,7 +233,9 @@ export default function CartPage() {
                   {loading ? "Processing..." : "Proceed to Payment"}
                 </button>
 
-                <p className="text-xs text-blue-100 text-center mt-4">✓ Secure payment powered by Razorpay</p>
+                <p className="text-xs text-blue-100 text-center mt-4">
+                  ✓ Secure payment powered by Razorpay
+                </p>
               </motion.div>
             </div>
           </div>

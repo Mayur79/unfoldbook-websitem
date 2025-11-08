@@ -1,12 +1,19 @@
+// src/components/MobileSearchBar.jsx
 import React, { useState } from "react";
-import { Search } from "lucide-react"; // main icon (for consistency)
+import { Search } from "lucide-react";
 
-const MobileSearchBar = ({ onSearch }) => {
+const MobileSearchBar = ({ onSearch, placeholder = "Search..." }) => {
   const [query, setQuery] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
     onSearch(query.trim());
+  };
+
+  const handleChange = (e) => {
+    const value = e.target.value;
+    setQuery(value);
+    onSearch(value.trim()); // live search as user types
   };
 
   return (
@@ -19,9 +26,9 @@ const MobileSearchBar = ({ onSearch }) => {
 
         <input
           type="text"
-          placeholder="Search documents..."
+          placeholder={placeholder}
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={handleChange}
           className="flex-grow bg-transparent outline-none text-sm placeholder-gray-500 text-gray-700 font-medium"
         />
 
@@ -30,7 +37,7 @@ const MobileSearchBar = ({ onSearch }) => {
           className="absolute right-2 flex items-center justify-center bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white rounded-full w-8 h-8 shadow-md hover:shadow-lg transition-all"
           aria-label="Search"
         >
-          <i className="bx bx-search text-lg leading-none"></i>
+          <Search size={16} />
         </button>
       </form>
     </div>

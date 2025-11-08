@@ -43,7 +43,7 @@ const BottomNavBar = () => {
 
       {/* Bottom Navigation Bar */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 font-poppins">
-        <div className="bg-white border-t border-blue-100 shadow-[0_-2px_8px_rgba(0,0,0,0.08)] flex justify-around items-center py-2 rounded-t-2xl">
+        <div className="bg-white border-t border-blue-100 shadow-[0_-2px_8px_rgba(0,0,0,0.08)] flex justify-around items-center py-2 ">
           {navItems.map(({ label, icon: Icon, path, count }) => {
             const isActive = location.pathname === path;
 
@@ -110,6 +110,16 @@ const BottomNavBar = () => {
                         </button>
                       </li>
                     )}
+
+                      <li>
+                        <button
+                          onClick={() => navigate("/my-document")}
+                          className="block w-full text-left px-4 py-2 hover:bg-blue-50 text-gray-800"
+                        >
+                          My Document
+                        </button>
+                      </li>
+                   
                     <li>
                       <button
                         onClick={logout}

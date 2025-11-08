@@ -62,7 +62,7 @@ const FillBanner = () => {
     }
   };
 
-  const renderBanner = (bannerType, files, setFiles) => {
+  const renderBanner = (bannerName, bannerType, files, setFiles) => {
     const alreadyUploaded = uploadedImages.filter(
       (img) => img.bannerType === bannerType
     ).length;
@@ -72,7 +72,7 @@ const FillBanner = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-blue-700 tracking-tight">
-            {bannerType.toUpperCase()}
+            {bannerName.toUpperCase()}
           </h2>
           <span className="text-xs text-gray-500">
             {alreadyUploaded}/5 Uploaded
@@ -166,8 +166,8 @@ const FillBanner = () => {
           </p>
         </div>
 
-        {renderBanner("Top Banner", banner1Files, setBanner1Files)}
-        {renderBanner("Bottom Banner", banner2Files, setBanner2Files)}
+        {renderBanner("Top Banner", "banner1", banner1Files, setBanner1Files)}
+        {renderBanner("Bottom Banner", "banner2", banner2Files, setBanner2Files)}
       </div>
     </div>
   );

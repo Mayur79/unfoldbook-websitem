@@ -24,6 +24,7 @@ import CheckoutPage from "./Pages/CheckoutPage";
 import Shop from "./Pages/Shop";
 import AdminMobileBlocked from "./Component/AdminMobileBlocked";
 import FillBanner from "./Pages/FillBanner";  
+import WishlistPage from "./Pages/Wishlist";
 
 function App() {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
@@ -93,6 +94,16 @@ function App() {
                       openLoginModal={() => setShowLoginModal(true)}
                     >
                       <CartPage />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/wishlist"
+                  element={
+                    <PrivateRoute
+                      openLoginModal={() => setShowLoginModal(true)}
+                    >
+                      <WishlistPage />
                     </PrivateRoute>
                   }
                 />

@@ -11,7 +11,7 @@ export default function Layout({ children }) {
     <div className="flex flex-col min-h-screen">
          <Toaster  richColors />
       <Navbar />
-      <MobileSearchBar />
+      {/* <MobileSearchBar /> */}
       <main className="flex-grow ">{children}</main>
          <BottomNavBar />
 

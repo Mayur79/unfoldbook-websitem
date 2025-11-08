@@ -144,5 +144,16 @@ router.get("/getUserCart", middleware, async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+router.get("/getUserWishlist", middleware, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).populate("wishlist");
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.json({ wishlist: user.wishlist });
+  } catch (error) {
+    console.error("Error fetching cart:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 module.exports = router;

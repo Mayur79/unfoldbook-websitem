@@ -139,7 +139,7 @@ export default function Footer() {
       </div>
 
       {/* Footer Bottom Bar */}
-      <div className="bg-blue-600 text-center text-sm py-3">
+      <div className="bg-blue-600 text-white text-center text-sm py-3 mb-16 md:mb-0">
         Copyright © {new Date().getFullYear()} UnFoldBoook Publication. All rights reserved.
       </div>
     </footer>

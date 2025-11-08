@@ -17,6 +17,7 @@ import {
   StarHalf,
 } from "lucide-react";
 import CategorySelection from "../Component/CategorySelection";
+import MobileSearchBar from "../Component/MobileSearchBar";
 
 export default function Documents() {
   const [docs, setDocs] = useState([]);
@@ -26,7 +27,7 @@ export default function Documents() {
   const [isSignupOpen, setIsSignupOpen] = useState(false);
   const navigate = useNavigate();
   const { user, toggleWishlist, toggleCart } = useAuth();
-
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
@@ -42,6 +43,10 @@ export default function Documents() {
   const getRandomRating = () => (Math.random() * (5 - 4) + 4).toFixed(1);
   const getRandomCount = () => Math.floor(Math.random() * 200) + 20;
 
+   const handleSearch = (query) => {
+    setSearchQuery(query.toLowerCase());
+    setCurrentPage(1);
+  };
   // Fetch Data
   useEffect(() => {
     async function fetchAll() {
@@ -102,10 +107,15 @@ export default function Documents() {
   }, [bottomBanners]);
 
   // Derived Data
-  const filteredDocs =
-    selectedCategory === "All"
-      ? docs
-      : docs.filter((doc) => doc.category?._id === selectedCategory);
+ const filteredDocs = docs.filter((doc) => {
+    const matchesCategory =
+      selectedCategory === "All" || doc.category?._id === selectedCategory;
+    const matchesSearch =
+      !searchQuery ||
+      doc.title.toLowerCase().includes(searchQuery) ||
+      doc.description?.toLowerCase().includes(searchQuery);
+    return matchesCategory && matchesSearch;
+  });
 
   const totalPages = Math.ceil(filteredDocs.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -145,6 +155,7 @@ export default function Documents() {
         onOpenLogin={() => setShowLoginModal(true)}
       />
 
+ <MobileSearchBar onSearch={handleSearch} placeholder="Search documents..." />
       {/* Top Banner Carousel */}
       {topBanners.length > 0 && (
         <div className="relative w-full overflow-hidden mb-5">
