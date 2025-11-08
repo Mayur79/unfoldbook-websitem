@@ -166,8 +166,8 @@ const FillBanner = () => {
           </p>
         </div>
 
-        {renderBanner("banner1", banner1Files, setBanner1Files)}
-        {renderBanner("banner2", banner2Files, setBanner2Files)}
+        {renderBanner("Top Banner", banner1Files, setBanner1Files)}
+        {renderBanner("Bottom Banner", banner2Files, setBanner2Files)}
       </div>
     </div>
   );
