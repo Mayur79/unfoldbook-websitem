@@ -6,7 +6,7 @@ import api from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "sonner";
 import DocumentsCard from "../Component/DocumentsCart";
-import BottomNavBar from "../Component/BottomNavBar";
+import BottomNavBar from "../Component/BottomNavbar";
 
 export default function Shop() {
   const [docs, setDocs] = useState([]);
