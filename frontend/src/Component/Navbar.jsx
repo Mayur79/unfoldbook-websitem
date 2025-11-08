@@ -77,9 +77,10 @@ const Navbar = () => {
           {/* Icons & User Menu */}
           <div className="flex items-center gap-4">
             {/* Search */}
+            {/* Search (Hidden on Mobile) */}
             <button
               onClick={() => console.log("Search clicked")}
-              className="p-2 rounded-full hover:bg-blue-50 transition"
+              className="hidden md:flex p-2 rounded-full hover:bg-blue-50 transition"
               aria-label="Search"
             >
               <Search size={20} className="text-gray-600" />

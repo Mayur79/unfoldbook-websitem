@@ -1,19 +1,20 @@
 // src/Pages/Shop.jsx
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Filter, ShoppingCart, ChevronLeft, ChevronRight } from "lucide-react";
+import React, { useEffect, useState, useMemo } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import api from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "sonner";
 import DocumentsCard from "../Component/DocumentsCart";
 import BottomNavBar from "../Component/BottomNavbar";
+import Navbar from "../Component/Navbar";
+import MobileSearchBar from "../Component/MobileSearchBar"; // ✅ import your search bar
 
 export default function Shop() {
   const [docs, setDocs] = useState([]);
+  const [searchQuery, setSearchQuery] = useState(""); // ✅ new state
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
   const { user, toggleWishlist, toggleCart } = useAuth();
-  const navigate = useNavigate();
 
   useEffect(() => {
     async function loadDocs() {
@@ -33,8 +34,18 @@ export default function Shop() {
     loadDocs();
   }, []);
 
-  const totalPages = Math.ceil(docs.length / itemsPerPage);
-  const currentDocs = docs.slice(
+  // ✅ Search filter (case-insensitive + matches partial text)
+  const filteredDocs = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return docs;
+    return docs.filter((doc) =>
+      doc.title.toLowerCase().includes(q) ||
+      doc.category?.categoryName?.toLowerCase().includes(q)
+    );
+  }, [docs, searchQuery]);
+
+  const totalPages = Math.ceil(filteredDocs.length / itemsPerPage);
+  const currentDocs = filteredDocs.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -47,35 +58,34 @@ export default function Shop() {
   };
 
   return (
-    <div className="font-poppins min-h-screen bg-gray-50 pb-20"> {/* increased bottom padding for navbar */}
-      {/* Top Bar */}
-      <div className="flex justify-between items-center px-6 py-4 bg-white shadow-sm sticky top-0 z-20">
-        <button className="flex items-center gap-2 text-gray-700 hover:text-blue-600">
-          <Filter size={20} />
-          <span className="font-medium hidden sm:block">Filter</span>
-        </button>
-        <h2 className="text-xl sm:text-2xl font-semibold text-blue-600">
-          Shop Documents
-        </h2>
-        <button
-          onClick={() => navigate("/cart")}
-          className="flex items-center gap-2 text-gray-700 hover:text-blue-600"
-        >
-          <ShoppingCart size={22} />
-          <span className="font-medium hidden sm:block">Cart</span>
-        </button>
+    <div className="font-poppins min-h-screen bg-gray-50 pb-20">
+      {/* ✅ Global Navbar */}
+      <div className="sticky top-0 z-40">
+        <Navbar />
+
+        {/* ✅ Mobile Search Bar (visible only on mobile) */}
+        <div className="block md:hidden sticky top-[64px] z-30 bg-white">
+          <MobileSearchBar onSearch={(query) => setSearchQuery(query)} />
+        </div>
       </div>
 
-      {/* Documents Grid */}
+      {/* ✅ Heading */}
+      <div className="text-center mt-4 mb-6">
+        <h2 className="text-2xl sm:text-3xl font-bold text-blue-600">
+          All Documents
+        </h2>
+       
+      </div>
+
+      {/* ✅ Documents Grid */}
       <DocumentsCard
         docs={currentDocs}
         user={user}
-        navigate={navigate}
         toggleWishlist={toggleWishlist}
         toggleCart={toggleCart}
       />
 
-      {/* Pagination */}
+      {/* ✅ Pagination */}
       {totalPages > 1 && (
         <div className="flex justify-center items-center mt-10 space-x-2 sm:space-x-3">
           <button
@@ -91,9 +101,9 @@ export default function Shop() {
               <button
                 key={i}
                 onClick={() => handlePageChange(i + 1)}
-                className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full font-medium text-sm flex items-center justify-center ${
+                className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full font-medium text-sm flex items-center justify-center transition-all ${
                   currentPage === i + 1
-                    ? "bg-blue-600 text-white shadow-md"
+                    ? "bg-blue-600 text-white shadow-md scale-105"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
               >
@@ -112,8 +122,8 @@ export default function Shop() {
         </div>
       )}
 
-      {/* ✅ Bottom Navigation Bar */}
-      <BottomNavBar/>
+      {/* ✅ Bottom Navigation */}
+      <BottomNavBar />
     </div>
   );
 }
