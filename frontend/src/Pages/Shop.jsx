@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, File } from "lucide-react";
 import api from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "sonner";
@@ -7,7 +7,7 @@ import DocumentsCard from "../Component/DocumentsCart";
 import BottomNavBar from "../Component/BottomNavbar";
 import Navbar from "../Component/Navbar";
 import MobileSearchBar from "../Component/MobileSearchBar"; // ✅ reusable search bar
-
+import { motion } from "framer-motion";
 export default function Shop() {
   const [docs, setDocs] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -106,12 +106,29 @@ export default function Shop() {
       </div>
 
       {/* ✅ Documents Grid */}
+      {currentDocs.length > 0 ? (
       <DocumentsCard
         docs={currentDocs}
         user={user}
         toggleWishlist={toggleWishlist}
         toggleCart={toggleCart}
-      />
+      />):(
+ <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="  p-12 sm:p-16 text-center "
+          >
+            <File className="w-20 h-20 text-blue-200 mx-auto mb-6" />
+            <h2 className="text-2xl font-semibold text-gray-800 mb-2">
+             No results found
+            </h2>
+            <p className="text-gray-500 mb-8">
+             
+             Try a different search term.
+            </p>
+           
+          </motion.div>
+      )}
 
       {/* ✅ Pagination */}
       {totalPages > 1 && (

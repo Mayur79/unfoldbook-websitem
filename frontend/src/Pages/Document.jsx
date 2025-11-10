@@ -11,6 +11,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Eye,
+  File,
   Heart,
   ShoppingCart,
   Star,
@@ -107,18 +108,20 @@ export default function Documents() {
   }, [bottomBanners]);
 
   // Derived Data
+
+  const isSearching = searchQuery.trim().length > 0;
+
 const filteredDocs = docs.filter((doc) => {
   const title = doc.title?.toLowerCase() || "";
   const desc = doc.description?.toLowerCase() || "";
   const query = searchQuery.toLowerCase();
 
+  const matchesSearch = title.includes(query) || desc.includes(query);
   const matchesCategory =
     selectedCategory === "All" || doc.category?._id === selectedCategory;
 
-  const matchesSearch =
-    !query || title.includes(query) || desc.includes(query);
-
-  return matchesCategory && matchesSearch;
+  // When searching, ignore category filter — show only search results
+  return isSearching ? matchesSearch : matchesCategory && matchesSearch;
 });
 
   const totalPages = Math.ceil(filteredDocs.length / itemsPerPage);
@@ -161,6 +164,8 @@ const filteredDocs = docs.filter((doc) => {
 
  <MobileSearchBar onSearch={handleSearch} placeholder="Search documents..." />
       {/* Top Banner Carousel */}
+          {!isSearching && (
+               <>
       {topBanners.length > 0 && (
         <div className="relative w-full overflow-hidden mb-5">
           <motion.div
@@ -189,6 +194,7 @@ const filteredDocs = docs.filter((doc) => {
           </div>
         </div>
       )}
+   
 
       {/* Section Title */}
       <div className="text-center mb-2 sm:mb-12">
@@ -207,9 +213,15 @@ const filteredDocs = docs.filter((doc) => {
         selectedCategoryName={selectedCategoryName}
       />
 
+   </>
+    )}
       {/* Documents Grid */}
+         {filteredDocs.length > 0 ? (
+
       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-6 lg:gap-8 justify-center mx-4 md:mx-20 mb-4">
-        {currentDocs.map((doc) => (
+        
+        {
+        currentDocs.map((doc) => (
           <div
             key={doc._id}
             onClick={() =>
@@ -298,10 +310,32 @@ const filteredDocs = docs.filter((doc) => {
               </div>
             </div>
           </div>
-        ))}
-      </div>
+        ))     }
 
-      {/* Pagination */}
+      </div>):(
+         
+        // ✅ Show this message when no document found
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white  border border-blue-100 p-12 sm:p-16 text-center shadow-sm"
+          >
+            <File className="w-20 h-20 text-blue-200 mx-auto mb-6" />
+            <h2 className="text-2xl font-semibold text-gray-800 mb-2">
+             No results found
+            </h2>
+            <p className="text-gray-500 mb-8">
+             
+             Try a different search term.
+            </p>
+           
+          </motion.div>
+      
+      )
+    }
+     
+        {!isSearching && (
+      <>
       {totalPages > 1 && (
         <div className="flex justify-center items-center mt-10 space-x-2 sm:space-x-3 mb-4">
           <button
@@ -363,6 +397,9 @@ const filteredDocs = docs.filter((doc) => {
           </div>
         </div>
       )}
+            </>
+    )}
+
     </div>
   );
 }
