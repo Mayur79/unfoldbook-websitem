@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Heart, ShoppingCart, User, Search, Store } from "lucide-react";
+import { Heart, ShoppingCart, User, Search, Store, Home } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import SignupModal from "../Pages/SignupModal";
 import LoginModal from "../Pages/Login";
@@ -18,7 +18,7 @@ const BottomNavBar = () => {
     { label: "Shop", icon: Store, path: "/shop" },
     { label: "Wishlist", icon: Heart, path: "/wishlist", count: user?.wishlist?.length || 0 },
     { label: "Cart", icon: ShoppingCart, path: "/cart", count: user?.cart?.length || 0 },
-    { label: "Search", icon: Search, path: "/search" },
+    { label: "Home", icon: Home, path: "/" },
   ];
 
   return (

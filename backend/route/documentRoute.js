@@ -515,6 +515,19 @@ router.delete("/delete/:type/:id", async (req, res) => {
       const docs = await documentModel.find({ category: id });
 
       for (const doc of docs) {
+        // Remove doc references from all users
+        await User
+        .updateMany(
+          {},
+          {
+            $pull: {
+              cart: doc._id,
+              wishlist: doc._id,
+              purchasedDocs: doc._id,
+            },
+          }
+        );
+
         // Delete file from both main and backup S3 buckets
         await deleteFromS3(doc.fileKey, MAIN_BUCKET);
         await deleteFromS3(doc.fileKey, BACKUP_BUCKET);
@@ -522,14 +535,28 @@ router.delete("/delete/:type/:id", async (req, res) => {
         await doc.deleteOne();
       }
 
-      // Delete the category
       await categoryModel.findByIdAndDelete(id);
-
       return res.status(200).json({ message: "Folder and its files deleted" });
-    } else if (type === "file") {
+    }
+
+    // Deleting single file
+    else if (type === "file") {
       const doc = await documentModel.findById(id);
       if (!doc) return res.status(404).json({ message: "File not found" });
 
+      // Remove from all users' cart, wishlist, purchasedDocs
+      await userModel.updateMany(
+        {},
+        {
+          $pull: {
+            cart: doc._id,
+            wishlist: doc._id,
+            purchasedDocs: doc._id,
+          },
+        }
+      );
+
+      // Delete from S3
       await deleteFromS3(doc.fileKey, MAIN_BUCKET);
       await deleteFromS3(doc.fileKey, BACKUP_BUCKET);
 
