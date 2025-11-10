@@ -107,15 +107,19 @@ export default function Documents() {
   }, [bottomBanners]);
 
   // Derived Data
- const filteredDocs = docs.filter((doc) => {
-    const matchesCategory =
-      selectedCategory === "All" || doc.category?._id === selectedCategory;
-    const matchesSearch =
-      !searchQuery ||
-      doc.title.toLowerCase().includes(searchQuery) ||
-      doc.description?.toLowerCase().includes(searchQuery);
-    return matchesCategory && matchesSearch;
-  });
+const filteredDocs = docs.filter((doc) => {
+  const title = doc.title?.toLowerCase() || "";
+  const desc = doc.description?.toLowerCase() || "";
+  const query = searchQuery.toLowerCase();
+
+  const matchesCategory =
+    selectedCategory === "All" || doc.category?._id === selectedCategory;
+
+  const matchesSearch =
+    !query || title.includes(query) || desc.includes(query);
+
+  return matchesCategory && matchesSearch;
+});
 
   const totalPages = Math.ceil(filteredDocs.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;

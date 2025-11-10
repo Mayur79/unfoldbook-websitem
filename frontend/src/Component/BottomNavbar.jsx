@@ -17,8 +17,9 @@ const BottomNavBar = () => {
   const navItems = [
     { label: "Shop", icon: Store, path: "/shop" },
     { label: "Wishlist", icon: Heart, path: "/wishlist", count: user?.wishlist?.length || 0 },
+     { label: "Home", icon: Home, path: "/" },
     { label: "Cart", icon: ShoppingCart, path: "/cart", count: user?.cart?.length || 0 },
-    { label: "Home", icon: Home, path: "/" },
+   
   ];
 
   return (
@@ -46,11 +47,20 @@ const BottomNavBar = () => {
         <div className="bg-white border-t border-blue-100 shadow-[0_-2px_8px_rgba(0,0,0,0.08)] flex justify-around items-center py-2 ">
           {navItems.map(({ label, icon: Icon, path, count }) => {
             const isActive = location.pathname === path;
+const handleClick = () => {
+    // If not logged in and the nav is Wishlist or Cart → show login modal
+    if (!user && (label === "Wishlist" || label === "Cart")) {
+      setShowLoginModal(true);
+      return;
+    }
+
+    navigate(path);
+  };
 
             return (
               <button
                 key={label}
-                onClick={() => navigate(path)}
+                onClick={handleClick}
                 className={`relative flex flex-col items-center text-[11px] transition-all duration-300 ${
                   isActive
                     ? "text-blue-600 scale-110"
