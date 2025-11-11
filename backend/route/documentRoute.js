@@ -516,7 +516,7 @@ router.delete("/delete/:type/:id", async (req, res) => {
 
       for (const doc of docs) {
         // Remove doc references from all users
-        await User
+        await userModel
         .updateMany(
           {},
           {

@@ -1,22 +1,43 @@
-import React from "react";
+import React, { useState } from "react";
 import { Eye, Heart, ShoppingCart, Star, StarHalf } from "lucide-react";
 import pdfimage from "../assets/pdfimage.png";
-
+import SignupModal from "../Pages/SignupModal";
+import LoginModal from "../Pages/Login";
+import { toast, Toaster } from "sonner";
+import { useNavigate } from "react-router-dom";
 export default function DocumentsCard({
   docs,
   user,
-  navigate,
   toggleWishlist,
   toggleCart,
 }) {
+
+    const [showLoginModal, setShowLoginModal] = useState(false);
+  const [isSignupOpen, setIsSignupOpen] = useState(false);
+  const navigate = useNavigate();
+   
+   const getRandomRating = () => (Math.random() * (5 - 4) + 4).toFixed(1);
+  const getRandomCount = () => Math.floor(Math.random() * 200) + 20;
   return (
+    <>
+     <LoginModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        onOpenSignup={() => setIsSignupOpen(true)}
+      />
+      <SignupModal
+        isOpen={isSignupOpen}
+        onClose={() => setIsSignupOpen(false)}
+        onOpenLogin={() => setShowLoginModal(true)}
+      />
+
     <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 lg:gap-8 justify-center mt-6 mx-4 md:mx-20">
       {docs.map((doc) => (
         <div
           key={doc._id}
           onClick={() =>
             navigate(`/doc/${doc._id}`, {
-              state: { rating: doc.rating, ratingCount: doc.ratingCount },
+              state: { rating: 4, ratingCount: 10 },
             })
           }
           className="group bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-100 hover:-translate-y-1"
@@ -39,7 +60,9 @@ export default function DocumentsCard({
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                navigate(`/viewer/${doc._id}`);
+ navigate(`/doc/${doc._id}`, {
+                state: { rating: doc.rating, ratingCount: doc.ratingCount },
+              })
               }}
               className="w-9 h-9 flex items-center justify-center bg-gray-100 hover:bg-blue-100 rounded-full text-gray-600 hover:text-blue-600 transition"
             >
@@ -47,7 +70,13 @@ export default function DocumentsCard({
             </button>
             <button
               onClick={(e) => {
+
                 e.stopPropagation();
+                             if (!user) {
+      toast.info("Please login to buy documents.");
+      setShowLoginModal(true);
+      return;
+    }
                 toggleCart(doc._id);
               }}
               className="w-9 h-9 flex items-center justify-center bg-gray-100 hover:bg-green-100 rounded-full text-gray-600 hover:text-green-600 transition"
@@ -61,6 +90,11 @@ export default function DocumentsCard({
             <button
               onClick={(e) => {
                 e.stopPropagation();
+                       if (!user) {
+      toast.info("Please login to buy documents.");
+      setShowLoginModal(true);
+      return;
+    }
                 toggleWishlist(doc._id);
               }}
               className="w-9 h-9 flex items-center justify-center bg-gray-100 hover:bg-pink-100 rounded-full text-gray-600 hover:text-pink-600 transition"
@@ -109,5 +143,7 @@ export default function DocumentsCard({
         </div>
       ))}
     </div>
+    <Toaster  richColors/>
+    </>
   );
 }

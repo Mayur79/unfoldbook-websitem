@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { Menu, X, Search, ShoppingCart } from "lucide-react";
+import { Menu, X, Search, ShoppingCart, Heart, Laptop } from "lucide-react";
 import LoginModal from "../Pages/Login";
 import SignupModal from "../Pages/SignupModal";
 import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
+import LaptopSearchbar from "./LaptopSearchbar";
+import { toast } from "sonner";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -30,7 +32,7 @@ const Navbar = () => {
 
       {/* Navbar */}
       <nav className="sticky top-0 z-50 bg-white/70 backdrop-blur-lg border-b border-blue-100 shadow-sm font-poppins transition-all duration-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
+       <div className="max-w-8xl mx-auto md:mx-4  px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between relative">
           {/* Logo */}
           <a href="/" className="flex items-center gap-2">
             <img src={logo} alt="Logo" className="h-8" />
@@ -76,25 +78,50 @@ const Navbar = () => {
 
           {/* Icons & User Menu */}
           <div className="flex items-center gap-4">
+            <LaptopSearchbar />
             {/* Search */}
             {/* Search (Hidden on Mobile) */}
-            <button
+            {/* <button
               onClick={() => console.log("Search clicked")}
               className="hidden md:flex p-2 rounded-full hover:bg-blue-50 transition"
               aria-label="Search"
             >
               <Search size={20} className="text-gray-600" />
-            </button>
+            </button> */}
 
             {/* Cart */}
             <button
-              onClick={() => navigate("/cart")}
+              onClick={() => {
+                
+                    if (!user) {
+      toast.info("Please login to buy documents.");
+      setShowLoginModal(true);
+      return;
+    }
+                navigate("/cart")}}
               className="relative p-2 rounded-full hover:bg-blue-50 transition"
               aria-label="Cart"
             >
               <ShoppingCart size={20} className="text-gray-600" />
               <span className="absolute top-1 right-1 bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-[10px] font-semibold rounded-full w-4 h-4 flex items-center justify-center">
                 {user?.cart?.length || 0}
+              </span>
+            </button>
+            <button
+              onClick={() => {
+                
+                       if (!user) {
+      toast.info("Please login to buy documents.");
+      setShowLoginModal(true);
+      return;
+    }
+                navigate("/wishlist")}}
+              className="relative p-2 rounded-full hover:bg-blue-50 transition"
+              aria-label="Cart"
+            >
+              <Heart size={20} className="text-gray-600" />
+              <span className="absolute top-1 right-1 bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-[10px] font-semibold rounded-full w-4 h-4 flex items-center justify-center">
+                {user?.wishlist?.length || 0}
               </span>
             </button>
 

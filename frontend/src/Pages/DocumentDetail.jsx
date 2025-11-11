@@ -16,6 +16,8 @@ import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import { toast } from "sonner";
+import SignupModal from "./SignupModal";
+import LoginModal from "./Login";
 
 export default function DocDetail() {
   const { id } = useParams();
@@ -28,6 +30,8 @@ export default function DocDetail() {
   const prevRef = useRef(null);
   const nextRef = useRef(null);
   const swiperRef = useRef(null);
+   const [showLoginModal, setShowLoginModal] = useState(false);
+    const [isSignupOpen, setIsSignupOpen] = useState(false);
 
   const passedRating = location.state?.rating;
   const passedCount = location.state?.ratingCount;
@@ -52,6 +56,17 @@ export default function DocDetail() {
   ];
 
   return (
+    <>
+        <LoginModal
+            isOpen={showLoginModal}
+            onClose={() => setShowLoginModal(false)}
+            onOpenSignup={() => setIsSignupOpen(true)}
+          />
+          <SignupModal
+            isOpen={isSignupOpen}
+            onClose={() => setIsSignupOpen(false)}
+            onOpenLogin={() => setShowLoginModal(true)}
+          />
     <div className="md:max-w-6xl sm:mx-auto mt-6 sm:mt-10 p-4 sm:p-6 bg-white rounded-xl shadow-lg font-poppins relative">
       {/* 🖼️ Fullscreen Modal */}
    {isFullscreen && (
@@ -287,6 +302,11 @@ export default function DocDetail() {
               className="w-10 h-10 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-100 transition"
               aria-label="Add to Wishlist"
               onClick={(e) => {
+                    if (!user) {
+      toast.info("Please login to buy documents.");
+      setShowLoginModal(true);
+      return;
+    }
                 e.stopPropagation();
                 toggleWishlist(doc._id);
               }}
@@ -304,6 +324,11 @@ export default function DocDetail() {
             <button
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-full text-sm sm:text-base shadow-md transition"
               onClick={(e) => {
+                    if (!user) {
+      toast.info("Please login to buy documents.");
+      setShowLoginModal(true);
+      return;
+    }
                 e.stopPropagation();
                 toggleCart(doc._id);
               }}
@@ -317,6 +342,7 @@ export default function DocDetail() {
               onClick={(e) => {
                 if (!user) {
       toast.info("Please login to buy documents.");
+      setShowLoginModal(true);
       return;
     }
 
@@ -339,5 +365,6 @@ export default function DocDetail() {
         </div>
       </div>
     </div>
+    </>
   );
 }

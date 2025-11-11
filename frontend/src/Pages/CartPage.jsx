@@ -61,7 +61,7 @@ export default function CartPage() {
               razorpaySignature: response.razorpay_signature,
             })
             toast.success("Payment Successful!")
-            navigate("/purchased")
+            navigate("/my-document")
           } catch {
             toast.error("Payment verification failed!")
           }

@@ -8,6 +8,8 @@ import BottomNavBar from "../Component/BottomNavbar";
 import Navbar from "../Component/Navbar";
 import MobileSearchBar from "../Component/MobileSearchBar"; // ✅ reusable search bar
 import { motion } from "framer-motion";
+import SignupModal from "./SignupModal";
+import LoginModal from "./Login";
 export default function Shop() {
   const [docs, setDocs] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -15,7 +17,10 @@ export default function Shop() {
   const itemsPerPage = 6;
   const { user, toggleWishlist, toggleCart } = useAuth();
   const [loading, setLoading] = useState(true);
-
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [isSignupOpen, setIsSignupOpen] = useState(false);
+   const getRandomRating = () => (Math.random() * (5 - 4) + 4).toFixed(1);
+  const getRandomCount = () => Math.floor(Math.random() * 200) + 20;
   // ✅ Fetch all documents
   useEffect(() => {
     async function loadDocs() {
@@ -23,8 +28,8 @@ export default function Shop() {
         const res = await api.get("/api/v1/doc");
         const docsWithRatings = res.data.map((doc) => ({
           ...doc,
-          rating: (Math.random() * (5 - 4) + 4).toFixed(1),
-          ratingCount: Math.floor(Math.random() * 200) + 20,
+  rating: getRandomRating(),
+          ratingCount: getRandomCount(),
         }));
         setDocs(docsWithRatings);
       } catch (err) {
@@ -77,6 +82,18 @@ export default function Shop() {
   }
 
   return (
+    <>
+      <LoginModal
+            isOpen={showLoginModal}
+            onClose={() => setShowLoginModal(false)}
+            onOpenSignup={() => setIsSignupOpen(true)}
+          />
+          <SignupModal
+            isOpen={isSignupOpen}
+            onClose={() => setIsSignupOpen(false)}
+            onOpenLogin={() => setShowLoginModal(true)}
+          />
+    
     <div className="font-poppins min-h-screen bg-gray-50 pb-20">
       {/* ✅ Navbar */}
       <div className="sticky top-0 z-40">
@@ -168,5 +185,6 @@ export default function Shop() {
       {/* ✅ Bottom Navigation */}
       <BottomNavBar />
     </div>
+    </>
   );
 }

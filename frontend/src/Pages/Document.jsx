@@ -257,7 +257,13 @@ const filteredDocs = docs.filter((doc) => {
               </button>
               <button
                 onClick={(e) => {
-                  e.stopPropagation();
+                    e.stopPropagation();
+                      if (!user) {
+                        toast.info("Please login to buy documents.");
+                        setShowLoginModal(true);
+                        return;
+                      }
+                
                   toggleCart(doc._id);
                 }}
                 className="w-9 h-9 flex items-center justify-center bg-gray-100 hover:bg-green-100 rounded-full text-gray-600 hover:text-green-600 transition"
@@ -270,7 +276,13 @@ const filteredDocs = docs.filter((doc) => {
               </button>
               <button
                 onClick={(e) => {
-                  e.stopPropagation();
+                     e.stopPropagation();
+                      if (!user) {
+                        toast.info("Please login to buy documents.");
+                        setShowLoginModal(true);
+                        return;
+                      }
+               
                   toggleWishlist(doc._id);
                 }}
                 className="w-9 h-9 flex items-center justify-center bg-gray-100 hover:bg-pink-100 rounded-full text-gray-600 hover:text-pink-600 transition"
