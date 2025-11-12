@@ -181,7 +181,7 @@ const filteredDocs = docs.filter((doc) => {
             <img
               src={topBanners[currentTop].url}
               alt={`Top Banner ${currentTop + 1}`}
-              className="w-full shadow-md h-48 md:h-72 object-fill"
+              className="w-full shadow-md h-48 md:h-128 object-fill"
             />
           </motion.div>
           <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
@@ -201,7 +201,7 @@ const filteredDocs = docs.filter((doc) => {
 
       {/* Section Title */}
       <div className="text-center mb-2 sm:mb-4">
-        <h2 className="text-2xl sm:text-3xl font-extrabold text-blue-600">
+        <h2 className="text-2xl sm:text-4xl font-extrabold text-blue-600">
           Buy - Download - Print
         </h2>
         <p className="text-[#64748b] mt-2">
@@ -221,7 +221,7 @@ const filteredDocs = docs.filter((doc) => {
       {/* Documents Grid */}
          {filteredDocs.length > 0 ? (
 
-      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6 lg:gap-16 justify-center mx-4 md:mx-40 mb-4 mt-4">
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-6 lg:gap-8 justify-center mx-4 md:mx-20 mb-4">
         
         {
         currentDocs.map((doc) => (
