@@ -6,6 +6,8 @@ import LoginModal from './Login';
 import SignupModal from './SignupModal';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { useSearch } from '../context/SearchContext';
+import MobileSearchBar from '../Component/MobileSearchBar';
 const MyDocument = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -13,6 +15,7 @@ const MyDocument = () => {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isSignupOpen, setIsSignupOpen] = useState(false);
 
+  const { searchQuery } = useSearch();
   useEffect(() => {
     if (user) loadPurchased();
   }, [user]);
@@ -54,6 +57,8 @@ const MyDocument = () => {
 
   return (
     <>
+      <MobileSearchBar/>
+
       <div className="font-poppins px-4 sm:px-8 py-6 min-h-screen">
         {/* Modals */}
         <LoginModal
@@ -66,7 +71,7 @@ const MyDocument = () => {
           onClose={() => setIsSignupOpen(false)}
           onOpenLogin={() => setShowLoginModal(true)}
         />
-
+      
         {/* Header */}
         <div className="mb-8 sm:mb-10 text-center sm:text-left">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-800 tracking-tight">
@@ -86,7 +91,10 @@ const MyDocument = () => {
               </p>
             </div>
           ) : (
-            purchased.map((doc) => (
+          purchased
+      .filter((doc) =>
+        doc.title.toLowerCase().includes(searchQuery.toLowerCase())
+      ).map((doc) => (
               <div
                 key={doc._id}
                 className="group flex flex-col bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden"

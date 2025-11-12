@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import CategorySelection from "../Component/CategorySelection";
 import MobileSearchBar from "../Component/MobileSearchBar";
+import { useSearch } from "../context/SearchContext";
 
 export default function Documents() {
   const [docs, setDocs] = useState([]);
@@ -28,7 +29,9 @@ export default function Documents() {
   const [isSignupOpen, setIsSignupOpen] = useState(false);
   const navigate = useNavigate();
   const { user, toggleWishlist, toggleCart } = useAuth();
-  const [searchQuery, setSearchQuery] = useState("");
+  // const [searchQuery, setSearchQuery] = useState("");
+    const { searchQuery } = useSearch();
+
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
@@ -162,7 +165,7 @@ const filteredDocs = docs.filter((doc) => {
         onOpenLogin={() => setShowLoginModal(true)}
       />
 
- <MobileSearchBar onSearch={handleSearch} placeholder="Search documents..." />
+ <MobileSearchBar />
       {/* Top Banner Carousel */}
           {!isSearching && (
                <>
@@ -178,7 +181,7 @@ const filteredDocs = docs.filter((doc) => {
             <img
               src={topBanners[currentTop].url}
               alt={`Top Banner ${currentTop + 1}`}
-              className="w-full shadow-md h-48 md:h-128 object-fill"
+              className="w-full shadow-md h-48 md:h-72 object-fill"
             />
           </motion.div>
           <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
@@ -197,8 +200,8 @@ const filteredDocs = docs.filter((doc) => {
    
 
       {/* Section Title */}
-      <div className="text-center mb-2 sm:mb-12">
-        <h2 className="text-2xl sm:text-4xl font-extrabold text-blue-600">
+      <div className="text-center mb-2 sm:mb-4">
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-blue-600">
           Buy - Download - Print
         </h2>
         <p className="text-[#64748b] mt-2">
@@ -218,7 +221,7 @@ const filteredDocs = docs.filter((doc) => {
       {/* Documents Grid */}
          {filteredDocs.length > 0 ? (
 
-      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-6 lg:gap-8 justify-center mx-4 md:mx-20 mb-4">
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6 lg:gap-16 justify-center mx-4 md:mx-40 mb-4 mt-4">
         
         {
         currentDocs.map((doc) => (
@@ -231,7 +234,7 @@ const filteredDocs = docs.filter((doc) => {
             }
             className="group relative bg-white overflow-hidden transition-all duration-300"
           >
-            <div className="relative w-full h-48 flex items-center justify-center overflow-hidden">
+            <div className="relative w-full  flex items-center justify-center overflow-hidden">
               <img
                 src={doc.thumbnailBase64 || pdfimage}
                 alt={doc.title}

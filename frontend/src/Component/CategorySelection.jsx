@@ -38,11 +38,11 @@ export default function CategorySelection({
       </div>
 
       {/* Category Heading Below */}
-      <div className="text-center mt-5">
+      {/* <div className="text-center mt-5">
         <h3 className="text-2xl sm:text-3xl font-bold text-blue-600">
           {selectedCategoryName || "All Documents"}
         </h3>
-      </div>
+      </div> */}
     </div>
   );
 }

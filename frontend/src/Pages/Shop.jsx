@@ -10,9 +10,10 @@ import MobileSearchBar from "../Component/MobileSearchBar"; // ✅ reusable sear
 import { motion } from "framer-motion";
 import SignupModal from "./SignupModal";
 import LoginModal from "./Login";
+import { useSearch } from "../context/SearchContext";
 export default function Shop() {
   const [docs, setDocs] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
+  const { searchQuery } = useSearch();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
   const { user, toggleWishlist, toggleCart } = useAuth();
@@ -101,7 +102,7 @@ export default function Shop() {
 
         {/* ✅ Mobile Search Bar */}
         <div className="block md:hidden sticky top-[64px] z-30 bg-white">
-          <MobileSearchBar onSearch={handleSearch} placeholder="Search documents..." />
+          <MobileSearchBar  />
         </div>
       </div>
 

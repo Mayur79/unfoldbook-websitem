@@ -1,13 +1,16 @@
 import React, { useState } from "react";
 import { Search } from "lucide-react";
+import { useSearch } from "../context/SearchContext";
 
-const MobileSearchBar = ({ onSearch, placeholder = "Search..." }) => {
-  const [query, setQuery] = useState("");
+const MobileSearchBar = ({ placeholder = "Search..." }) => {
+ const { searchQuery, setSearchQuery } = useSearch();
 
   const handleChange = (e) => {
-    const value = e.target.value;
-    setQuery(value);
-    onSearch(value); // no need to trim or lowercase here, do it in parent
+    setSearchQuery(e.target.value);
+  };
+
+  const clearSearch = () => {
+    setSearchQuery("");
   };
 
   return (
@@ -17,7 +20,7 @@ const MobileSearchBar = ({ onSearch, placeholder = "Search..." }) => {
         <input
           type="text"
           placeholder={placeholder}
-          value={query}
+          value={searchQuery}
           onChange={handleChange}
           className="flex-grow bg-transparent outline-none text-sm placeholder-gray-500 text-gray-700 font-medium"
         />
