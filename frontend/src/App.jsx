@@ -25,7 +25,7 @@ import Shop from "./Pages/Shop";
 import AdminMobileBlocked from "./Component/AdminMobileBlocked";
 import FillBanner from "./Pages/FillBanner";  
 import WishlistPage from "./Pages/Wishlist";
-
+import AboutPage from "./Pages/AboutPage";
 function App() {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
 
@@ -67,6 +67,7 @@ function App() {
             <Layout>
               <Routes>
                 <Route path="/" element={<Navigate to="/home" replace />} />
+                <Route path="/about" element={<AboutPage />} />
                 <Route
                   path="/dashboard"
                   element={

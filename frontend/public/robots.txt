@@ -1,0 +1,33 @@
+User-agent: *
+# Allow the site root and public assets
+Allow: /
+
+# Disallow backend/API endpoints and internal admin pages
+Disallow: /api/
+Disallow: /api/
+Disallow: /admin/
+Disallow: /admin
+Disallow: /admin/*
+Disallow: /server/
+Disallow: /backend/
+Disallow: /auth/
+Disallow: /login
+Disallow: /signup
+
+# Don't index private user areas
+Disallow: /my-document/settings
+Disallow: /my-document/*
+Disallow: /checkout
+Disallow: /cart
+Disallow: /viewer/
+
+# Provide sitemap location
+Sitemap: https://www.unfoldbooks.in/sitemap.xml
+
+# Crawl rate recommendation (optional)
+Crawl-delay: 5
+
+# Specific rules for Googlebot (ensure Googlebot can fetch JS/CSS)
+User-agent: Googlebot
+Allow: /static/
+Allow: /assets/
