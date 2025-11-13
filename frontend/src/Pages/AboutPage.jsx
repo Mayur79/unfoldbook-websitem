@@ -189,7 +189,7 @@ const AboutPage = () => {
             learning partner.
           </p>
           <a
-            href="mailto:contact@unfoldbooks.in"
+            href="mailto: theroyal.gondia@gmail.com"
             className="inline-flex items-center gap-2 px-8 py-3 bg-white text-blue-700 font-medium rounded-full shadow-md hover:bg-blue-50 hover:-translate-y-1 transition-transform"
           >
             <Mail size={18} /> Contact Us
