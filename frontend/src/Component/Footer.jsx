@@ -2,15 +2,24 @@ import { useState } from "react";
 import { Mail, MapPin, Phone, Clock, ChevronDown, ChevronUp } from "lucide-react";
 import { FaFacebookF, FaInstagram, FaLinkedinIn, FaYoutube } from "react-icons/fa";
 import logo from "../assets/logo.png";
+import TermsModal from "./TermModal";
+import RefundModal from "./RefundModal";
+import PrivacyModal from "./PrivacyModal";
 
 export default function Footer() {
   const [openSection, setOpenSection] = useState(null);
+  const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
 
+const [isRefundOpen, setIsRefundOpen] = useState(false);
   const toggleSection = (section) => {
     setOpenSection(openSection === section ? null : section);
   };
-
+    const [isTermsOpen, setIsTermsOpen] = useState(false);
   return (
+    <>
+    <TermsModal isOpen={isTermsOpen} onClose={() => setIsTermsOpen(false)} />
+      <RefundModal isOpen={isRefundOpen} onClose={() => setIsRefundOpen(false)} />
+        <PrivacyModal isOpen={isPrivacyOpen} onClose={() => setIsPrivacyOpen(false)} />
     <footer className="bg-blue-100 text-black font-poppins">
       <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 
@@ -86,9 +95,10 @@ export default function Footer() {
             <li>Contact Us</li>
             <li>FAQs</li>
             <li>Catalogue</li>
-            <li>Refund Policy</li>
-            <li>Terms of Service</li>
-            <li>Privacy Policy</li>
+            <li   onClick={() => setIsRefundOpen(true)} className="cursor-pointer">Refund Policy</li>
+            <li onClick={() => setIsTermsOpen(true)} className="cursor-pointer">Terms of Service</li>
+            <li   onClick={() => setIsPrivacyOpen(true)} className="cursor-pointer"
+>Privacy Policy</li>
           </ul>
         </div>
 
@@ -143,5 +153,6 @@ export default function Footer() {
         Copyright © {new Date().getFullYear()} UnFoldBoook Publication. All rights reserved.
       </div>
     </footer>
+    </>
   );
 }
